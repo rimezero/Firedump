@@ -1,0 +1,417 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="firedumpdbModel.Store" Provider="System.Data.SQLite.EF6" ProviderManifestToken="data source=&quot;C:\Users\abraham\Documents\Visual Studio 2015\Projects\firedump\Firedump\Firedump\db\firedumpdb.db&quot;" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="backup_locations">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="integer" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="name" Type="varchar" MaxLength="45" />
+          <Property Name="username" Type="varchar" MaxLength="45" />
+          <Property Name="password" Type="varchar" MaxLength="45" />
+          <Property Name="path" Type="nvarchar" MaxLength="2147483647" />
+        </EntityType>
+        <EntityType Name="logs">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="integer" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="schedule_id" Type="integer" />
+          <Property Name="type" Type="integer" Nullable="false" />
+          <Property Name="message" Type="nvarchar" MaxLength="2147483647" />
+          <Property Name="date" Type="datetime" />
+          <Property Name="success" Type="integer" />
+        </EntityType>
+        <EntityType Name="mysql_servers">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="integer" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="name" Type="varchar" MaxLength="80" Nullable="false" />
+          <Property Name="port" Type="integer" Nullable="false" />
+          <Property Name="host" Type="nvarchar" MaxLength="2147483647" Nullable="false" />
+          <Property Name="username" Type="varchar" MaxLength="45" Nullable="false" />
+          <Property Name="password" Type="varchar" MaxLength="45" Nullable="false" />
+        </EntityType>
+        <EntityType Name="schedule_save_locations">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="integer" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="schedule_id" Type="integer" />
+          <Property Name="service_type" Type="integer" />
+          <Property Name="backup_location_id" Type="integer" />
+        </EntityType>
+        <EntityType Name="schedules">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="integer" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="server_id" Type="integer" Nullable="false" />
+          <Property Name="name" Type="varchar" MaxLength="45" Nullable="false" />
+          <Property Name="date" Type="datetime" />
+          <Property Name="activated" Type="integer" Nullable="false" />
+          <Property Name="hours" Type="integer" Nullable="false" />
+        </EntityType>
+        <EntityType Name="userinfo">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="integer" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="schedule_id" Type="integer" />
+          <Property Name="successemail" Type="varchar" MaxLength="45" />
+          <Property Name="failemail" Type="varchar" MaxLength="45" />
+        </EntityType>
+        <Association Name="FK_logs_0_0">
+          <End Role="schedules" Type="Self.schedules" Multiplicity="0..1" />
+          <End Role="logs" Type="Self.logs" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="schedules">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="logs">
+              <PropertyRef Name="schedule_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_schedule_save_locations_0_0">
+          <End Role="schedules" Type="Self.schedules" Multiplicity="0..1" />
+          <End Role="schedule_save_locations" Type="Self.schedule_save_locations" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="schedules">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="schedule_save_locations">
+              <PropertyRef Name="schedule_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_schedule_save_locations_1_0">
+          <End Role="backup_locations" Type="Self.backup_locations" Multiplicity="0..1" />
+          <End Role="schedule_save_locations" Type="Self.schedule_save_locations" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="backup_locations">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="schedule_save_locations">
+              <PropertyRef Name="backup_location_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_schedules_0_0">
+          <End Role="mysql_servers" Type="Self.mysql_servers" Multiplicity="1" />
+          <End Role="schedules" Type="Self.schedules" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="mysql_servers">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="schedules">
+              <PropertyRef Name="server_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_userinfo_0_0">
+          <End Role="schedules" Type="Self.schedules" Multiplicity="0..1" />
+          <End Role="userinfo" Type="Self.userinfo" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="schedules">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="userinfo">
+              <PropertyRef Name="schedule_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="firedumpdbModelStoreContainer">
+          <EntitySet Name="backup_locations" EntityType="Self.backup_locations" store:Type="Tables" />
+          <EntitySet Name="logs" EntityType="Self.logs" store:Type="Tables" />
+          <EntitySet Name="mysql_servers" EntityType="Self.mysql_servers" store:Type="Tables" />
+          <EntitySet Name="schedule_save_locations" EntityType="Self.schedule_save_locations" store:Type="Tables" />
+          <EntitySet Name="schedules" EntityType="Self.schedules" store:Type="Tables" />
+          <EntitySet Name="userinfo" EntityType="Self.userinfo" store:Type="Tables" />
+          <AssociationSet Name="FK_logs_0_0" Association="Self.FK_logs_0_0">
+            <End Role="schedules" EntitySet="schedules" />
+            <End Role="logs" EntitySet="logs" />
+          </AssociationSet>
+          <AssociationSet Name="FK_schedule_save_locations_0_0" Association="Self.FK_schedule_save_locations_0_0">
+            <End Role="schedules" EntitySet="schedules" />
+            <End Role="schedule_save_locations" EntitySet="schedule_save_locations" />
+          </AssociationSet>
+          <AssociationSet Name="FK_schedule_save_locations_1_0" Association="Self.FK_schedule_save_locations_1_0">
+            <End Role="backup_locations" EntitySet="backup_locations" />
+            <End Role="schedule_save_locations" EntitySet="schedule_save_locations" />
+          </AssociationSet>
+          <AssociationSet Name="FK_schedules_0_0" Association="Self.FK_schedules_0_0">
+            <End Role="mysql_servers" EntitySet="mysql_servers" />
+            <End Role="schedules" EntitySet="schedules" />
+          </AssociationSet>
+          <AssociationSet Name="FK_userinfo_0_0" Association="Self.FK_userinfo_0_0">
+            <End Role="schedules" EntitySet="schedules" />
+            <End Role="userinfo" EntitySet="userinfo" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="firedumpdbModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="backup_locations">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="name" Type="String" MaxLength="45" FixedLength="false" Unicode="false" />
+          <Property Name="username" Type="String" MaxLength="45" FixedLength="false" Unicode="false" />
+          <Property Name="password" Type="String" MaxLength="45" FixedLength="false" Unicode="false" />
+          <Property Name="path" Type="String" MaxLength="2147483647" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="schedule_save_locations" Relationship="Self.FK_schedule_save_locations_1_0" FromRole="backup_locations" ToRole="schedule_save_locations" />
+        </EntityType>
+        <EntityType Name="logs">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="schedule_id" Type="Int64" />
+          <Property Name="type" Type="Int64" Nullable="false" />
+          <Property Name="message" Type="String" MaxLength="2147483647" FixedLength="false" Unicode="true" />
+          <Property Name="date" Type="DateTime" />
+          <Property Name="success" Type="Int64" />
+          <NavigationProperty Name="schedules" Relationship="Self.FK_logs_0_0" FromRole="logs" ToRole="schedules" />
+        </EntityType>
+        <EntityType Name="mysql_servers">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="name" Type="String" MaxLength="80" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="port" Type="Int64" Nullable="false" />
+          <Property Name="host" Type="String" MaxLength="2147483647" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="username" Type="String" MaxLength="45" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="password" Type="String" MaxLength="45" FixedLength="false" Unicode="false" Nullable="false" />
+          <NavigationProperty Name="schedules" Relationship="Self.FK_schedules_0_0" FromRole="mysql_servers" ToRole="schedules" />
+        </EntityType>
+        <EntityType Name="schedule_save_locations">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="schedule_id" Type="Int64" />
+          <Property Name="service_type" Type="Int64" />
+          <Property Name="backup_location_id" Type="Int64" />
+          <NavigationProperty Name="backup_locations" Relationship="Self.FK_schedule_save_locations_1_0" FromRole="schedule_save_locations" ToRole="backup_locations" />
+          <NavigationProperty Name="schedules" Relationship="Self.FK_schedule_save_locations_0_0" FromRole="schedule_save_locations" ToRole="schedules" />
+        </EntityType>
+        <EntityType Name="schedules">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="server_id" Type="Int64" Nullable="false" />
+          <Property Name="name" Type="String" MaxLength="45" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="date" Type="DateTime" />
+          <Property Name="activated" Type="Int64" Nullable="false" />
+          <Property Name="hours" Type="Int64" Nullable="false" />
+          <NavigationProperty Name="logs" Relationship="Self.FK_logs_0_0" FromRole="schedules" ToRole="logs" />
+          <NavigationProperty Name="mysql_servers" Relationship="Self.FK_schedules_0_0" FromRole="schedules" ToRole="mysql_servers" />
+          <NavigationProperty Name="schedule_save_locations" Relationship="Self.FK_schedule_save_locations_0_0" FromRole="schedules" ToRole="schedule_save_locations" />
+          <NavigationProperty Name="userinfo" Relationship="Self.FK_userinfo_0_0" FromRole="schedules" ToRole="userinfo" />
+        </EntityType>
+        <EntityType Name="userinfo">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="schedule_id" Type="Int64" />
+          <Property Name="successemail" Type="String" MaxLength="45" FixedLength="false" Unicode="false" />
+          <Property Name="failemail" Type="String" MaxLength="45" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="schedules" Relationship="Self.FK_userinfo_0_0" FromRole="userinfo" ToRole="schedules" />
+        </EntityType>
+        <Association Name="FK_schedule_save_locations_1_0">
+          <End Role="backup_locations" Type="Self.backup_locations" Multiplicity="0..1" />
+          <End Role="schedule_save_locations" Type="Self.schedule_save_locations" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="backup_locations">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="schedule_save_locations">
+              <PropertyRef Name="backup_location_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_logs_0_0">
+          <End Role="schedules" Type="Self.schedules" Multiplicity="0..1" />
+          <End Role="logs" Type="Self.logs" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="schedules">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="logs">
+              <PropertyRef Name="schedule_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_schedules_0_0">
+          <End Role="mysql_servers" Type="Self.mysql_servers" Multiplicity="1" />
+          <End Role="schedules" Type="Self.schedules" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="mysql_servers">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="schedules">
+              <PropertyRef Name="server_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_schedule_save_locations_0_0">
+          <End Role="schedules" Type="Self.schedules" Multiplicity="0..1" />
+          <End Role="schedule_save_locations" Type="Self.schedule_save_locations" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="schedules">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="schedule_save_locations">
+              <PropertyRef Name="schedule_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_userinfo_0_0">
+          <End Role="schedules" Type="Self.schedules" Multiplicity="0..1" />
+          <End Role="userinfo" Type="Self.userinfo" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="schedules">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="userinfo">
+              <PropertyRef Name="schedule_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="firedumpdbEntities1" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="backup_locations" EntityType="Self.backup_locations" />
+          <EntitySet Name="logs" EntityType="Self.logs" />
+          <EntitySet Name="mysql_servers" EntityType="Self.mysql_servers" />
+          <EntitySet Name="schedule_save_locations" EntityType="Self.schedule_save_locations" />
+          <EntitySet Name="schedules" EntityType="Self.schedules" />
+          <EntitySet Name="userinfo" EntityType="Self.userinfo" />
+          <AssociationSet Name="FK_schedule_save_locations_1_0" Association="Self.FK_schedule_save_locations_1_0">
+            <End Role="backup_locations" EntitySet="backup_locations" />
+            <End Role="schedule_save_locations" EntitySet="schedule_save_locations" />
+          </AssociationSet>
+          <AssociationSet Name="FK_logs_0_0" Association="Self.FK_logs_0_0">
+            <End Role="schedules" EntitySet="schedules" />
+            <End Role="logs" EntitySet="logs" />
+          </AssociationSet>
+          <AssociationSet Name="FK_schedules_0_0" Association="Self.FK_schedules_0_0">
+            <End Role="mysql_servers" EntitySet="mysql_servers" />
+            <End Role="schedules" EntitySet="schedules" />
+          </AssociationSet>
+          <AssociationSet Name="FK_schedule_save_locations_0_0" Association="Self.FK_schedule_save_locations_0_0">
+            <End Role="schedules" EntitySet="schedules" />
+            <End Role="schedule_save_locations" EntitySet="schedule_save_locations" />
+          </AssociationSet>
+          <AssociationSet Name="FK_userinfo_0_0" Association="Self.FK_userinfo_0_0">
+            <End Role="schedules" EntitySet="schedules" />
+            <End Role="userinfo" EntitySet="userinfo" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="firedumpdbModelStoreContainer" CdmEntityContainer="firedumpdbEntities1">
+          <EntitySetMapping Name="backup_locations">
+            <EntityTypeMapping TypeName="firedumpdbModel.backup_locations">
+              <MappingFragment StoreEntitySet="backup_locations">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="username" ColumnName="username" />
+                <ScalarProperty Name="password" ColumnName="password" />
+                <ScalarProperty Name="path" ColumnName="path" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="logs">
+            <EntityTypeMapping TypeName="firedumpdbModel.logs">
+              <MappingFragment StoreEntitySet="logs">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="schedule_id" ColumnName="schedule_id" />
+                <ScalarProperty Name="type" ColumnName="type" />
+                <ScalarProperty Name="message" ColumnName="message" />
+                <ScalarProperty Name="date" ColumnName="date" />
+                <ScalarProperty Name="success" ColumnName="success" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="mysql_servers">
+            <EntityTypeMapping TypeName="firedumpdbModel.mysql_servers">
+              <MappingFragment StoreEntitySet="mysql_servers">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="port" ColumnName="port" />
+                <ScalarProperty Name="host" ColumnName="host" />
+                <ScalarProperty Name="username" ColumnName="username" />
+                <ScalarProperty Name="password" ColumnName="password" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="schedule_save_locations">
+            <EntityTypeMapping TypeName="firedumpdbModel.schedule_save_locations">
+              <MappingFragment StoreEntitySet="schedule_save_locations">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="schedule_id" ColumnName="schedule_id" />
+                <ScalarProperty Name="service_type" ColumnName="service_type" />
+                <ScalarProperty Name="backup_location_id" ColumnName="backup_location_id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="schedules">
+            <EntityTypeMapping TypeName="firedumpdbModel.schedules">
+              <MappingFragment StoreEntitySet="schedules">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="server_id" ColumnName="server_id" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="date" ColumnName="date" />
+                <ScalarProperty Name="activated" ColumnName="activated" />
+                <ScalarProperty Name="hours" ColumnName="hours" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="userinfo">
+            <EntityTypeMapping TypeName="firedumpdbModel.userinfo">
+              <MappingFragment StoreEntitySet="userinfo">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="schedule_id" ColumnName="schedule_id" />
+                <ScalarProperty Name="successemail" ColumnName="successemail" />
+                <ScalarProperty Name="failemail" ColumnName="failemail" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Firedump", "Firedump\Firedump.csproj", "{FFEF1C2E-E951-4270-AFBB-807CA84BB79B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FiredumpTest", "FiredumpTest\FiredumpTest.csproj", "{0DE0F112-0F08-44E3-A951-3CE8E0ADE004}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CaretPosition", "CaretPosition\CaretPosition\CaretPosition.csproj", "{1BCB161E-FEB5-4CF2-B925-076D94427827}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FFEF1C2E-E951-4270-AFBB-807CA84BB79B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FFEF1C2E-E951-4270-AFBB-807CA84BB79B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FFEF1C2E-E951-4270-AFBB-807CA84BB79B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FFEF1C2E-E951-4270-AFBB-807CA84BB79B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0DE0F112-0F08-44E3-A951-3CE8E0ADE004}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0DE0F112-0F08-44E3-A951-3CE8E0ADE004}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0DE0F112-0F08-44E3-A951-3CE8E0ADE004}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0DE0F112-0F08-44E3-A951-3CE8E0ADE004}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1BCB161E-FEB5-4CF2-B925-076D94427827}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1BCB161E-FEB5-4CF2-B925-076D94427827}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1BCB161E-FEB5-4CF2-B925-076D94427827}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1BCB161E-FEB5-4CF2-B925-076D94427827}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="d3e8b5c9c7344c439e961be58dbed152" Name="Diagram1">
+        <EntityTypeShape EntityType="firedumpdbModel.backup_locations" Width="1.5" PointX="6" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="firedumpdbModel.logs" Width="1.5" PointX="5.25" PointY="4.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="firedumpdbModel.mysql_servers" Width="1.5" PointX="0.75" PointY="5.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="firedumpdbModel.schedule_save_locations" Width="1.5" PointX="8.25" PointY="5.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="firedumpdbModel.schedules" Width="1.5" PointX="3" PointY="5.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="firedumpdbModel.userinfo" Width="1.5" PointX="5.25" PointY="10.375" IsExpanded="true" />
+        <AssociationConnector Association="firedumpdbModel.FK_schedule_save_locations_1_0" ManuallyRouted="false" />
+        <AssociationConnector Association="firedumpdbModel.FK_logs_0_0" ManuallyRouted="false" />
+        <AssociationConnector Association="firedumpdbModel.FK_schedules_0_0" ManuallyRouted="false" />
+        <AssociationConnector Association="firedumpdbModel.FK_schedule_save_locations_0_0" ManuallyRouted="false" />
+        <AssociationConnector Association="firedumpdbModel.FK_userinfo_0_0" ManuallyRouted="false" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>
