@@ -525,7 +525,7 @@ namespace Firedump
             pbDumpExec?.Invoke((MethodInvoker)delegate () {
                 try
                 {
-                    pbDumpExec.Value = pbDumpExec.Maximum;
+                    pbDumpExec.Value = progress;
                 }
                 catch(ArgumentOutOfRangeException ex)
                 {
@@ -667,7 +667,7 @@ namespace Firedump
                     this.Invoke((MethodInvoker)delegate ()
                     {
                         progressContainer = new ProgressFormContainer();
-                        progressContainer.Show();
+                        //progressContainer.Show();
                         foreach (ListViewItem item in lbSaveLocations.Items)
                         {
                             Object loc = item.Tag;
@@ -827,9 +827,9 @@ namespace Firedump
         private void setSaveProgressHandler(int progress, int speed)
         {
             setProgressValue(progress);
-            Console.WriteLine(speed);
+            //Console.WriteLine(speed);
             if(speed == -1) { return; }
-            Console.WriteLine(speed);
+            //Console.WriteLine(speed);
             string speedlabelext = "B/s";
             double tspeed = 0;
             if(speed <= 1050)

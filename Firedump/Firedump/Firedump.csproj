@@ -413,6 +413,7 @@
       <DependentUpon>firedumpDataModel.tt</DependentUpon>
     </Compile>
     <Compile Include="models\databaseUtils\SqlUtils.cs" />
+    <Compile Include="utils\EncryptionUtils.cs" />
     <Compile Include="utils\OS.cs" />
     <Compile Include="utils\StringUtils.cs" />
     <EmbeddedResource Include="Forms\AboutForm.resx">
@@ -677,6 +678,8 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="resources\mycomputericon.png" />
+    <Content Include="resources\mysqldump\mysqlbinlog.exe" />
+    <Content Include="resources\mysqldump\mysqlimport.exe" />
     <Content Include="WinSCP.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

@@ -164,7 +164,7 @@ namespace Firedump.models.configuration.jsonconfig
         public MySqlDumpConfig initializeConfig()
         {
             try
-            {
+            {    
                 string json = File.ReadAllText(jsonFilePath);
                 dynamic jsonObj = JsonConvert.DeserializeObject(json);
                 //<Field initialization>

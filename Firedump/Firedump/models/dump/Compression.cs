@@ -221,7 +221,7 @@ namespace Firedump.models.dump
                 while (!proc.StandardOutput.EndOfStream)
                 {
                     string line = proc.StandardOutput.ReadLine();
-                    Console.WriteLine("Comp:" + line);
+                    //Console.WriteLine("Comp:" + line);
 
 
                     if (line.Contains("%"))
