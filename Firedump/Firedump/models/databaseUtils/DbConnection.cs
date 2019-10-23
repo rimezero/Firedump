@@ -15,6 +15,7 @@ namespace Firedump.models.databaseUtils
         public DbConnection() {
             port = 3306;
         }
+
         //den prepei na einai singleton auto me tpt mporei na ginonte taftoxrona connections se diaforous server
         private static DbConnection instance = null;
         public static DbConnection Instance()

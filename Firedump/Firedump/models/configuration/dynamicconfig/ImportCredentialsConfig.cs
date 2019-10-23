@@ -11,5 +11,7 @@ namespace Firedump.models.configuration.dynamicconfig
         public string database { set; get; }
         public string scriptPath { set; get; }
         public string scriptDelimeter { set; get; } = ";";
+        public bool isIncremental { set; get; }
+
     }
 }

@@ -70,7 +70,10 @@ namespace Firedump.models.sqlimport
             try
             {
                 sqlimportInstance.script = File.ReadAllText(sqlimportInstance.config.scriptPath);
-                int commandsCount = StringUtils.countOccurances(sqlimportInstance.script, sqlimportInstance.config.scriptDelimeter);
+                int commandsCount = 1;
+                if (!sqlimportInstance.config.isIncremental) {
+                    commandsCount = StringUtils.countOccurances(sqlimportInstance.script, sqlimportInstance.config.scriptDelimeter);
+                }
                 if (commandsCount == 0) commandsCount = 1;
                 onImportInit(commandsCount);
 
