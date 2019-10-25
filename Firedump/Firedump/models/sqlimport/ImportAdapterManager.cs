@@ -234,7 +234,10 @@ namespace Firedump.models.sqlimport
 
         public void cancel()
         {
-
+            if (importadapter!=null)
+            {
+                importadapter.cancelProcess();
+            }         
         }
 
         private void deletefiles()

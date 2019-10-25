@@ -69,12 +69,27 @@ namespace Firedump.models.sqlimport
         {
             try
             {
-                sqlimportInstance.script = File.ReadAllText(sqlimportInstance.config.scriptPath);
+                if (sqlimportInstance.config.isIncremental)
+                {
+                    //check if chain import is needed and handle it  FIX LATER
+                }
+
                 int commandsCount = 1;
-                if (!sqlimportInstance.config.isIncremental) {
-                    commandsCount = StringUtils.countOccurances(sqlimportInstance.script, sqlimportInstance.config.scriptDelimeter);
+                try
+                {
+                    commandsCount = File.ReadLines(sqlimportInstance.config.scriptPath).Count();
+                    if (commandsCount < 1)
+                    {
+                        sqlimportInstance.scriptStatus = "Script is empty.";
+                    }
+                }catch(Exception e)
+                {
+                    sqlimportInstance.scriptStatus = e.Message;
+                    Console.WriteLine(e.StackTrace);
                 }
                 if (commandsCount == 0) commandsCount = 1;
+
+                //here fix progress if executing multiple scripts in succession (count total commands from all scripts and handle accordingly in progress event handler of this class)
                 onImportInit(commandsCount);
 
                 innertask = new Task<ImportResultSet>(sqlimportInstance.executeScript);
@@ -91,6 +106,10 @@ namespace Firedump.models.sqlimport
             }
         }
 
+        public void cancelProcess()
+        {
+            sqlimportInstance.cancelProcess();
+        }
         private void onProgressHandler(int progress)
         {
             onImportProgress(progress);

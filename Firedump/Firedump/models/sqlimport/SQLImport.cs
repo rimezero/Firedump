@@ -21,7 +21,7 @@ namespace Firedump.models.sqlimport
             Progress?.Invoke(progress);
         }
         //</events>
-        public string script { set; get; }
+        public string scriptStatus { set; get; }
         public ImportCredentialsConfig config { get; }
         private int commandCounter = 0;
         private string connectionString;
@@ -54,7 +54,7 @@ namespace Firedump.models.sqlimport
                 connectionString += ";database=" + config.database;
             }
         }
-
+        /*
         private bool isServerCompatible()
         {
             bool isCompatible = true;
@@ -64,47 +64,40 @@ namespace Firedump.models.sqlimport
             //check if the user has super priviledge and if binary logging is enabled on the server
             //if not stop and pop message
             return isCompatible;
-        }
+        }*/
 
         public ImportResultSet executeScript()
         {
-            //proswrino
-            config.isIncremental = true;
-            //proswrino
             ImportResultSet result = new ImportResultSet();
-            if (string.IsNullOrWhiteSpace(this.script))
+            if (!string.IsNullOrWhiteSpace(this.scriptStatus))
             {
                 result.wasSuccessful = false;
-                result.errorMessage = "Script not set";
+                result.errorMessage = this.scriptStatus;              
                 return result;
             }
             try
             {
-                if (config.isIncremental)
+                /* not needed for import only needed for dump keeping as example
+                if (!isServerCompatible())
                 {
-                    if (!isServerCompatible())
-                    {
-                        result.wasSuccessful = false;
-                        result.errorMessage = "The user has no super priviledge on the server or binary logging is not enabled.";
-                        return result;
-                    }
-                    result = importBinaryLog();
-                }
-                else
-                {
-                    result = executeSQLscript();
-                }
+                    result.wasSuccessful = false;
+                    result.errorMessage = "The user has no super priviledge on the server or binary logging is not enabled.";
+                    return result;
+                }*/
+                result = executeSQLscript();
+                //result = executeSQLscript();
 
             }
             catch (Exception ex)
             {
                 result.wasSuccessful = false;
-                result.errorMessage = ex.Message;
+                result.errorMessage = "import task: "+ex.Message;
             }
 
             return result;
         }
 
+        /* old method using MySqlScript
         private ImportResultSet executeSQLscript()
         {
             ImportResultSet result = new ImportResultSet();
@@ -118,9 +111,9 @@ namespace Firedump.models.sqlimport
             script.Execute();
             result.wasSuccessful = true;
             return result;
-        }
+        }*/
 
-        private ImportResultSet importBinaryLog()
+        private ImportResultSet executeSQLscript()
         {
             ImportResultSet result = new ImportResultSet();
 
@@ -144,17 +137,28 @@ namespace Firedump.models.sqlimport
             try
             {
                 StreamReader sr = new StreamReader(config.scriptPath);
+                int index = 1;
                 string line = "";
                 while ((line = sr.ReadLine()) != null)
                 {
                     proc.StandardInput.WriteLine(line);
+                    onProgress(index);
+                    index++;
                     //Console.WriteLine("Log file line: "+line);
                 }
                 proc.StandardInput.Close(); //ama den ginei auto perimenei endlessly gia input
             }catch(Exception ex)
             {
                 result.wasSuccessful = false;
-                result.errorMessage = ex.Message;
+                if (proc == null || proc.HasExited)
+                {
+                    result.errorMessage = "Mysql.exe import proccess was killed.";
+                }
+                else
+                {
+                    result.errorMessage = "Mysql import: "+ex.Message;
+                }
+               
             }
             
 
@@ -207,10 +211,31 @@ namespace Firedump.models.sqlimport
         {
             StringBuilder arguments = new StringBuilder();
             //proswrina
-            arguments.Append("-h localhost -u root -pSSSS"); //set password here
+            arguments.Append("-h ");
+            arguments.Append(config.host);
+            arguments.Append(" -u ");
+            arguments.Append(config.username);
+            arguments.Append(" -p");
+            arguments.Append(config.password);
+
+            if (!string.IsNullOrWhiteSpace(config.database))
+            {
+                arguments.Append(" ");
+                arguments.Append(config.database);
+            }
             //Console.WriteLine(arguments.ToString());
-            //nvironment.Exit(0);
+            //Environment.Exit(0);
             return arguments;
+        }
+
+        public void cancelProcess()
+        {
+            if (proc != null && !proc.HasExited)
+            {
+                proc.Kill();
+                proc.Dispose();
+                proc = null;
+            }
         }
         
     }
