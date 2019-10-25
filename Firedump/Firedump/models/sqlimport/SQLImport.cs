@@ -217,7 +217,11 @@ namespace Firedump.models.sqlimport
             arguments.Append(config.username);
             arguments.Append(" -p");
             arguments.Append(config.password);
-
+            if (config.port != 3306)
+            {
+                arguments.Append(" -P ");
+                arguments.Append(config.port);
+            }
             if (!string.IsNullOrWhiteSpace(config.database))
             {
                 arguments.Append(" ");
