@@ -95,7 +95,7 @@ namespace Firedump.models.dump
                 {
                     filewriter.WriteLine(proc.StandardOutput.ReadLine());
                 }
-
+                filewriter.Close();
                 result.mysqlbinlogexeStandardError = "";
                 while (!proc.StandardError.EndOfStream)
                 {
@@ -209,14 +209,8 @@ namespace Firedump.models.dump
 
         private void performChecks()
         {
-            if (config.logfiles.Length == 0)
-            {
-                result.wasSuccessful = false;
-                result.errorNumber = -2;
-                result.errorMessage = "Binary log file names on server not set.";
-                return;
-            }
-            if (config.locationIds.Length == 0)
+            
+            if (config.locationIds?.Length == 0)
             {
                 result.wasSuccessful = false;
                 result.errorNumber = -2;
@@ -226,6 +220,13 @@ namespace Firedump.models.dump
 
             IncrementalUtils iutils = new IncrementalUtils(config);
             config = iutils.calculateDumpConfig();
+            if (config.logfiles?.Length == 0)
+            {
+                result.wasSuccessful = false;
+                result.errorNumber = -2;
+                result.errorMessage = "Binary log file names on server not set.";
+                return;
+            }
             if (config.prefix.StartsWith("FB_0.0.0"))
             {
                 result.wasSuccessful = false;

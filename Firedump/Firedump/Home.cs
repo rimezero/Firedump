@@ -836,7 +836,56 @@ namespace Firedump
 
         private void onCompletedHandlerBinlog(BinlogDumpResultset status)
         {
+            if (status != null)
+            {
 
+                lStatus.Invoke((MethodInvoker)delegate ()
+                {
+                    lStatus.Text = "Completed";
+                });
+
+                pbDumpExec.Invoke((MethodInvoker)delegate ()
+                {
+                    pbDumpExec.Value = pbDumpExec.Maximum;
+                });
+
+                if (status.wasSuccessful)
+                {
+                    saveToLocations(status.fileAbsPath, status.incrementalFormatPrefix);
+                }
+                else
+                {
+                    this.UseWaitCursor = false;
+                    string errorMessage = "";
+                    switch (status.errorNumber)
+                    {
+                        case 1:
+                            errorMessage = "Connection credentials not set correctly:\n" + status.errorMessage;
+                            Console.WriteLine(errorMessage);
+                            break;
+                        case 2:
+                            errorMessage = "Binlog dump failed:\n" + status.mysqlbinlogexeStandardError;
+                            Console.WriteLine(errorMessage);
+                            break;
+                        case 3:
+                            errorMessage = "Compression failed:\n" + status.mysqlbinlogexeStandardError;
+                            Console.WriteLine(errorMessage);
+                            break;
+                        default:
+                            break;
+                    }
+                    MessageBox.Show(errorMessage, "Dump failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                    bStartDump.Invoke((MethodInvoker)delegate ()
+                    {
+                        bStartDump.Enabled = true;
+                    });
+                }
+            }
+            else
+            {
+                this.UseWaitCursor = false;
+            }
         }
 
         private void saveToLocations(string fileAbsPath, string prefix)

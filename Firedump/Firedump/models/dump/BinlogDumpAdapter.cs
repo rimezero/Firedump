@@ -82,7 +82,7 @@ namespace Firedump.models.dump
             mysqldumpTask.Start();
         }
 
-        private void dumpExecutor()
+        private async void dumpExecutor()
         {
             
             MySQLCredentialsConfig cnf = new MySQLCredentialsConfig();
@@ -91,7 +91,7 @@ namespace Firedump.models.dump
             cnf.username = config.username;
             cnf.password = config.password;
             cnf.database = config.database;
-            DbConnection con = new DbConnection();
+            DbConnection con = new DbConnection(cnf);
             if (!con.testConnection().wasSuccessful)
             {
                 onError(-1);

@@ -165,6 +165,7 @@ namespace Firedump.models.dump
                 splitIndexes.Add(bpIndex.Split('.'));
             }
             int maxindex = 0;
+            int maxfullindex = 0;
             if (splitIndexes.Count()>1)
             {
                 for (int i = 1; i < splitIndexes.Count(); i++)
@@ -176,6 +177,20 @@ namespace Firedump.models.dump
                     int indexCurrA = Convert.ToInt32(splitIndexes[i][0]);
                     int indexCurrB = Convert.ToInt32(splitIndexes[i][1]);
                     int indexCurrC = Convert.ToInt32(splitIndexes[i][2]);
+
+                    //find previous full backup
+                    int indexMaxFullA = Convert.ToInt32(splitIndexes[maxfullindex][0]);
+                    if (indexCurrB==0 && indexCurrC == 0)
+                    {
+                        if (indexCurrA>indexMaxFullA)
+                        {
+                            maxfullindex = i;
+                        }
+                        if (splitIndexes[maxfullindex][1]!="0" || splitIndexes[maxfullindex][2]!="0")
+                        {
+                            maxfullindex = i;
+                        }
+                    }
 
                     if (indexCurrA>indexMaxA)
                     {
@@ -195,10 +210,11 @@ namespace Firedump.models.dump
                     }
                 }
             }
-            //se periptwsi incremental na pernei san start date to startdate tou proigoumenou full backup k oxi tou max !!
+
             int iMaxA = Convert.ToInt32(splitIndexes[maxindex][0]);
             int iMaxB = Convert.ToInt32(splitIndexes[maxindex][1]);
             int iMaxC = Convert.ToInt32(splitIndexes[maxindex][2]);
+            restable[0] = splitBpFnames[maxindex][3].Split('.')[0];
             switch (bpType)
             {
                 case 0:
@@ -207,6 +223,7 @@ namespace Firedump.models.dump
                     break;
                 case 1:
                     iMaxB++;
+                    restable[0] = splitBpFnames[maxfullindex][3].Split('.')[0];
                     nextprefix = "IB_" + iMaxA + "." + iMaxB + ".0";
                     break;
                 case 2:
@@ -217,7 +234,7 @@ namespace Firedump.models.dump
 
                     break;
             }
-            restable[0] = splitBpFnames[maxindex][3].Split('.')[0];
+            
             restable[1] = nextprefix;
             return restable;
         }
