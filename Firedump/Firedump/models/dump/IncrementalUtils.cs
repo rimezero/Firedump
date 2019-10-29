@@ -74,42 +74,49 @@ namespace Firedump.models.dump
                 }
             }
 
+            List<string> bpIndexes = new List<string>();
             if (index == -1)
             {
                 //periptwsi p den iparxei save location local fix argotera
+                string path = locations[0].path; //dialegw tixea to prwto location
+                string[] splitpath = StringUtils.splitPath(path);
+                List<string> fnames = new List<string>();
+                //edw ftp directory listing
             }
             else
             {
-                string path = locations[index].path;
-                List<string> bpIndexes = getBpIndexes(path);
-                if (bpIndexes.Count()>0)
+                string path = locations[index].path;   
+                string[] splitpath = StringUtils.splitPath(path);
+                List<string> fnames = new List<string>();
+                foreach (string fname in Directory.GetFiles(splitpath[0]))
                 {
-                    prefix += findNext(bpIndexes,bpType);
+                    fnames.Add(fname.Replace(splitpath[0], ""));
                 }
-                else
-                {
-                    prefix += "FB_0.0.0";
-                }
+                bpIndexes = getBpIndexes(fnames, splitpath[1]);
+                
                 //Console.WriteLine("path "+splitpath[0]);
                 //Console.WriteLine("filename " + splitpath[1]);
+            }
+
+            if (bpIndexes.Count() > 0)
+            {
+                prefix += findNext(bpIndexes, bpType);
+            }
+            else
+            {
+                prefix += "FB_0.0.0";
             }
             //</filename_prefix>
 
             return prefix;
         }
 
-        private List<string> getBpIndexes(string path)
-        {
-            string[] splitpath = StringUtils.splitPath(path);
-            List<string> fnames = new List<string>();
-            foreach (string fname in Directory.GetFiles(splitpath[0]))
-            {
-                fnames.Add(fname.Replace(splitpath[0], ""));
-            }
+        private List<string> getBpIndexes(List<string> fnames, string splitName)
+        {  
             List<string> backupFiles = new List<string>();
             foreach (string fname in fnames)
             {
-                if (fname.Contains(splitpath[1]) && fname.Contains("_"))
+                if (fname.Contains(splitName) && fname.Contains("_"))
                 {
                     backupFiles.Add(fname);
                 }
