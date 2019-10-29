@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Firedump.models.configuration.dynamicconfig;
+using Firedump.models.databaseUtils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -35,19 +37,11 @@ namespace Firedump.models.dump
         }
 
         //onCompleted
-        public delegate void completed(DumpResultSet status);
+        public delegate void completed(BinlogDumpResultset status);
         public event completed Completed;
-        private void onCompleted(DumpResultSet status)
+        private void onCompleted(BinlogDumpResultset status)
         {
             Completed?.Invoke(status);
-        }
-
-        //onTableRowCount
-        public delegate void tableRowCount(int rowcount);
-        public event tableRowCount TableRowCount;
-        private void onTableRowCount(int rowcount)
-        {
-            TableRowCount?.Invoke(rowcount);
         }
 
         //onCompressProgress
@@ -67,5 +61,75 @@ namespace Firedump.models.dump
         }
 
         //</events>
+
+        private BinlogDump dumpInstance;
+        public BinlogDumpCredentialsConfig config { set; get; }
+        public BinlogDumpAdapter() { }
+        public BinlogDumpAdapter(BinlogDumpCredentialsConfig config)
+        {
+            this.config = config;
+        }
+
+        public void startDump()
+        {
+            onProgress("Binary log dump initiated.");
+            if (config==null)
+            {
+                onError(-2);
+                return;
+            }
+            Task mysqldumpTask = new Task(dumpExecutor);
+            mysqldumpTask.Start();
+        }
+
+        private void dumpExecutor()
+        {
+            
+            MySQLCredentialsConfig cnf = new MySQLCredentialsConfig();
+            cnf.host = config.host;
+            cnf.port = config.port;
+            cnf.username = config.username;
+            cnf.password = config.password;
+            cnf.database = config.database;
+            DbConnection con = new DbConnection();
+            if (!con.testConnection().wasSuccessful)
+            {
+                onError(-1);
+                return;
+            }
+            onProgress("Dumping from binary logs...");
+            dumpInstance = new BinlogDump();
+            dumpInstance.config = config;
+            dumpInstance.CompressStart += onCompressStartHandler;
+            dumpInstance.CompressProgress += onCompressProgressHandler;
+
+            BinlogDumpResultset result = dumpInstance.executeDump();
+            onCompleted(result);
+            dumpInstance = null;
+        }
+
+        internal void cancelDump()
+        {
+            if (dumpInstance != null)
+            {
+                dumpInstance.cancelBinlogDumpProcess();
+                dumpInstance = null;
+            }
+        }
+
+        public bool isDumpRunning()
+        {
+            return dumpInstance != null;
+        }
+
+        private void onCompressProgressHandler(int progress)
+        {
+            onCompressProgress(progress);
+        }
+
+        private void onCompressStartHandler()
+        {
+            onCompressStart();
+        }
     }
 }

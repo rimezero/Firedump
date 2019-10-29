@@ -136,7 +136,7 @@ namespace Firedump.service
                                 //File.AppendAllText(@"servicelog.txt", "Addbackup_locationsRow " + temp[0].id + temp[0].name);
                             }
                             
-                            locationAdapterManager = new LocationAdapterManager(locations, resultSet.fileAbsPath);
+                            locationAdapterManager = new LocationAdapterManager(locations, resultSet.fileAbsPath, null);
                             locationAdapterManager.SaveInit += onSaveInitHandler;
                             locationAdapterManager.InnerSaveInit += onInnerSaveInitHandler;
                             locationAdapterManager.LocationProgress += onLocationProgressHandler;

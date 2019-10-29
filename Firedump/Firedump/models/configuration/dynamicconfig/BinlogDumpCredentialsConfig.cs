@@ -22,5 +22,6 @@ namespace Firedump.models.configuration.dynamicconfig
         public bool isIncrementalDelta { set; get; } = false;
         public string prefix { set; get; }
         public int[] locationIds { set; get; }
+        public string startDateTime { set; get; }
     }
 }

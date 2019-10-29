@@ -26,7 +26,7 @@ namespace Firedump.models.location
             LocationAdapter adapter = new LocationAdapter(this);
             adapter.setLocalLocation(config);
             adapter.sendFile();*/
-            LocationAdapterManager adapter = new LocationAdapterManager(new List<int> { 2,3,4,5}, "K:\\MyStuff\\summer season 2015 checkout\\[Ajin2.com] Ajin Season 2 Episode 4 [720p].mkv");
+            LocationAdapterManager adapter = new LocationAdapterManager(new List<int> { 2,3,4,5}, "K:\\MyStuff\\summer season 2015 checkout\\[Ajin2.com] Ajin Season 2 Episode 4 [720p].mkv", null);
             adapter.startSave();
         }
 

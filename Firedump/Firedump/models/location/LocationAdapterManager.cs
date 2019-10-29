@@ -69,11 +69,13 @@ namespace Firedump.models.location
         private firedumpdbDataSetTableAdapters.backup_locationsTableAdapter backup_adapter = new firedumpdbDataSetTableAdapters.backup_locationsTableAdapter(); //malon tha xreiastei adapter pou tha einai join pinakwn tha doume
         private int currentProgress = 0;
         private string sourcePath;
+        private string fnamePrefix;
         private LocationAdapterManager() { }
-        public LocationAdapterManager(List<int> locations, string sourcePath)
+        public LocationAdapterManager(List<int> locations, string sourcePath, string fnamePrefix)
         {
             this.locations = locations;
             this.sourcePath = sourcePath;
+            this.fnamePrefix = fnamePrefix;
             init();
         }
         private void init()
@@ -132,12 +134,14 @@ namespace Firedump.models.location
             {              
                 case 0: //file system
                     config = new LocationCredentialsConfig();
+                    config.fnamePrefix = fnamePrefix;
                     config.sourcePath = sourcePath;
                     config.locationPath = (string)data.Rows[0]["path"];
                     adapter.setLocalLocation(config);
                     break;
                 case 1: //FTP
                     config = new FTPCredentialsConfig();
+                    config.fnamePrefix = fnamePrefix;
                     config.sourcePath = sourcePath;
                     config.locationPath = (string)data.Rows[0]["path"]+(string)data.Rows[0]["filename"];
                     ((FTPCredentialsConfig)config).id = (Int64)data.Rows[0]["id"];
@@ -171,6 +175,7 @@ namespace Firedump.models.location
                     break;
                 case 3: //Google drive
                     config = new LocationCredentialsConfig();
+                    config.fnamePrefix = fnamePrefix;
                     //EDW SETUP TO CONFIG
                     adapter.setCloudDriveLocation(config);
                     break;

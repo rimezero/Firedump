@@ -199,6 +199,28 @@ namespace Firedump.models.databaseUtils
             return databases;
         }
 
+        public string getCurrentDatetime()
+        {
+            connection = new MySqlConnection(conStringBuilder());
+            connection.Open();
+            string timenow = "";
+
+            string query = "select date_format(now(), '%Y-%m-%d %T');";
+            MySqlCommand command = new MySqlCommand(query, connection);
+            MySqlDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                timenow = reader.GetString(0);
+            }
+
+            if (connection.State == ConnectionState.Open)
+            {
+                connection.Close();
+            }
+
+            return timenow;
+        }
+
         public List<string> getBinlogfilenames()
         {
             connection = new MySqlConnection(conStringBuilder());

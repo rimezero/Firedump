@@ -36,6 +36,7 @@ namespace Firedump
         private bool hideSystemDatabases = true;
         private string locationName = "";
         private ProgressFormContainer progressContainer;
+        private string fnamePrefix = "";
         //form instances
         private static GeneralConfiguration genConfig;
         private GeneralConfiguration getGenConfigInstance()
@@ -51,7 +52,7 @@ namespace Firedump
         {
             InitializeComponent();       
             adapter = new MySqlDumpAdapter();
-            
+            logadapter = new BinlogDumpAdapter();
         }
 
 
@@ -391,7 +392,12 @@ namespace Firedump
                 MessageBox.Show("dump is running...");
                 return;
             }
-            adapter = new MySqlDumpAdapter();
+            if (logadapter.isDumpRunning())
+            {
+                MessageBox.Show("dump is running...");
+                return;
+            }
+            
 
             List<string> databases = new List<string>();
             List<string> excludedTables = new List<string>();
@@ -419,29 +425,23 @@ namespace Firedump
                     excludedTables.Add(tables);
                 }
             }
-            
-            DumpCredentialsConfig config = new DumpCredentialsConfig();
-            config.host = (string)serverData.Rows[cmbServers.SelectedIndex]["host"];
-            config.port = unchecked((int)(long)serverData.Rows[cmbServers.SelectedIndex]["port"]);
-            config.username = (string)serverData.Rows[cmbServers.SelectedIndex]["username"];
-            config.password = (string)serverData.Rows[cmbServers.SelectedIndex]["password"];
-
+            /*
             //testing
             BinlogDumpCredentialsConfig configtest1 = new BinlogDumpCredentialsConfig();
-            configtest1.host = config.host;
-            configtest1.port = config.port;
-            configtest1.username = config.username;
-            configtest1.password = config.password;
+            configtest1.host = (string)serverData.Rows[cmbServers.SelectedIndex]["host"];
+            configtest1.port = unchecked((int)(long)serverData.Rows[cmbServers.SelectedIndex]["port"]);
+            configtest1.username = (string)serverData.Rows[cmbServers.SelectedIndex]["username"];
+            configtest1.password = (string)serverData.Rows[cmbServers.SelectedIndex]["password"];
 
             backuplocations = new List<firedumpdbDataSet.backup_locationsRow>();
-            List<int> locationIds = new List<int>();
+            List<int> locationIds1 = new List<int>();
             foreach (ListViewItem item in lbSaveLocations.Items)
             {
                 Object loc = item.Tag;
                 backuplocations.Add((firedumpdbDataSet.backup_locationsRow)loc);
-                locationIds.Add((int)((firedumpdbDataSet.backup_locationsRow)loc).id);
+                locationIds1.Add((int)((firedumpdbDataSet.backup_locationsRow)loc).id);
             }
-            configtest1.locationIds = locationIds.ToArray();
+            configtest1.locationIds = locationIds1.ToArray();
             configtest1.isIncrementalDelta = true;
             IncrementalUtils iutils = new IncrementalUtils(configtest1);
             configtest1 = iutils.calculateDumpConfig();
@@ -450,49 +450,106 @@ namespace Firedump
             {
                 Console.WriteLine(logfile);
             }
-            Console.WriteLine("Next prefix: "+configtest1.prefix);
+            Console.WriteLine("Next prefix: " + configtest1.prefix);
+            Console.WriteLine("StartDateTime: " + configtest1.startDateTime);
             bool a = true; //gia na mi vgazei unreachable code apo katw
-            if(a) return;
-            // /testing
+            if (a) return;
+            // /testing*/
 
+            if (cIncrementalFormat.Checked && databases.Count() > 1)
+            {
+                MessageBox.Show("Only one database may be selected with incremental format enabled.", "MySQL dump", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
             if (databases.Count == 0)
             {
-                MessageBox.Show("No database selected","MySQL Dump",MessageBoxButtons.OK,MessageBoxIcon.Error);
+                MessageBox.Show("No database selected", "MySQL Dump", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            else if(databases.Count == 1)
+
+            if (!cIncrementalFormat.Checked || rbFull.Checked)
             {
-                config.database = databases[0];
-                if (excludedTables[0] != "")
+                adapter = new MySqlDumpAdapter();
+                DumpCredentialsConfig config = new DumpCredentialsConfig();
+                config.host = (string)serverData.Rows[cmbServers.SelectedIndex]["host"];
+                config.port = unchecked((int)(long)serverData.Rows[cmbServers.SelectedIndex]["port"]);
+                config.username = (string)serverData.Rows[cmbServers.SelectedIndex]["username"];
+                config.password = (string)serverData.Rows[cmbServers.SelectedIndex]["password"];
+
+                
+                if (databases.Count == 1)
                 {
-                    config.excludeTablesSingleDatabase = excludedTables[0];
+                    config.database = databases[0];
+                    if (excludedTables[0] != "")
+                    {
+                        config.excludeTablesSingleDatabase = excludedTables[0];
+                    }
                 }
+                else
+                {
+                    databaseList = databases;
+                    config.database = databases[0];
+                    config.databases = databases.ToArray();
+                    config.excludeTables = excludedTables.ToArray();
+                }
+
+                pbDumpExec.Value = 0;
+
+                bStartDump.Enabled = false;
+                adapter.setTableList(tableList);
+
+                adapter.Cancelled += onCancelledHandler;
+                adapter.Completed += onCompletedHandler;
+                adapter.CompressProgress += compressProgressHandler;
+                adapter.CompressStart += onCompressStartHandler;
+                adapter.Error += onErrorHandler;
+                adapter.InitDumpTables += initDumpTablesHandler;
+                adapter.Progress += onProgressHandler;
+                adapter.TableRowCount += tableRowCountHandler;
+                adapter.TableStartDump += onTableDumpStartHandler;
+
+                this.UseWaitCursor = true;
+                adapter.startDump(config);
             }
             else
             {
-                databaseList = databases;
-                config.database = databases[0];
-                config.databases = databases.ToArray();
-                config.excludeTables = excludedTables.ToArray();
+                logadapter = new BinlogDumpAdapter();
+                BinlogDumpCredentialsConfig config = new BinlogDumpCredentialsConfig();
+                config.host = (string)serverData.Rows[cmbServers.SelectedIndex]["host"];
+                config.port = unchecked((int)(long)serverData.Rows[cmbServers.SelectedIndex]["port"]);
+                config.username = (string)serverData.Rows[cmbServers.SelectedIndex]["username"];
+                config.password = (string)serverData.Rows[cmbServers.SelectedIndex]["password"];
+                config.database = databases[0]; //if here only one database is selected due to above checks
+
+                backuplocations = new List<firedumpdbDataSet.backup_locationsRow>();
+                List<int> locationIds = new List<int>();
+                foreach (ListViewItem item in lbSaveLocations.Items)
+                {
+                    Object loc = item.Tag;
+                    backuplocations.Add((firedumpdbDataSet.backup_locationsRow)loc);
+                    locationIds.Add((int)((firedumpdbDataSet.backup_locationsRow)loc).id);
+                }
+                config.locationIds = locationIds.ToArray();
+
+                pbDumpExec.Value = 0;
+                bStartDump.Enabled = false;
+
+                logadapter.config = config;
+
+                //handlers
+                logadapter.Cancelled += onCancelledHandler;
+                logadapter.Completed += onCompletedHandlerBinlog;
+                logadapter.CompressProgress += compressProgressHandler;
+                logadapter.CompressStart += onCompressStartHandler;
+                logadapter.Error += onErrorHandler;
+                //handlers
+
+                this.UseWaitCursor = true;
+                logadapter.startDump();
             }
 
-            pbDumpExec.Value = 0;
+            
 
-            bStartDump.Enabled = false;
-            adapter.setTableList(tableList);
-
-            adapter.Cancelled += onCancelledHandler;
-            adapter.Completed += onCompletedHandler;
-            adapter.CompressProgress += compressProgressHandler;
-            adapter.CompressStart += onCompressStartHandler;
-            adapter.Error += onErrorHandler;
-            adapter.InitDumpTables += initDumpTablesHandler;
-            adapter.Progress += onProgressHandler;
-            adapter.TableRowCount += tableRowCountHandler;
-            adapter.TableStartDump += onTableDumpStartHandler;
-
-            this.UseWaitCursor = true;
-            adapter.startDump(config);
+            
             
         }
 
@@ -685,40 +742,58 @@ namespace Firedump
 
                 if (status.wasSuccessful)
                 {
-                    //EDW KALEITAI TO SAVE STA LOCATIONS
-                    List<int> locations = new List<int>();
-                    backuplocations = new List<firedumpdbDataSet.backup_locationsRow>();
-                    dataGridView1.Invoke((MethodInvoker)delegate ()
+                    string prefix = null;
+                    if (cIncrementalFormat.Checked)
                     {
-                        dataGridView1.Rows.Clear();
-                        dataGridView1.Refresh();
-                    });
-                    
-                    this.Invoke((MethodInvoker)delegate ()
-                    {
-                        progressContainer = new ProgressFormContainer();
-                        //progressContainer.Show();
-                        foreach (ListViewItem item in lbSaveLocations.Items)
+                        this.Invoke((MethodInvoker)delegate ()
                         {
-                            Object loc = item.Tag;
-                            locations.Add(Convert.ToInt32(((firedumpdbDataSet.backup_locationsRow)loc).id));
-                            backuplocations.Add((firedumpdbDataSet.backup_locationsRow)loc);
-                            addToGridView(loc);
-                        }
-                        
-                    });
-                    
+                            List<int> locations = new List<int>();
+                            foreach (ListViewItem item in lbSaveLocations.Items)
+                            {
+                                Object loc = item.Tag;
+                                locations.Add(Convert.ToInt32(((firedumpdbDataSet.backup_locationsRow)loc).id));
+                            }
+                            BinlogDumpCredentialsConfig config = new BinlogDumpCredentialsConfig();
+                            config.host = (string)serverData.Rows[cmbServers.SelectedIndex]["host"];
+                            config.port = unchecked((int)(long)serverData.Rows[cmbServers.SelectedIndex]["port"]);
+                            config.username = (string)serverData.Rows[cmbServers.SelectedIndex]["username"];
+                            config.password = (string)serverData.Rows[cmbServers.SelectedIndex]["password"];
 
-                    adapterLocation = new LocationAdapterManager(locations,status.fileAbsPath);
-                    adapterLocation.SaveInit += onSaveInitHandler;
-                    adapterLocation.InnerSaveInit += onInnerSaveInitHandler;
-                    adapterLocation.LocationProgress += onLocationProgressHandler;
-                    adapterLocation.SaveProgress += setSaveProgressHandler;
-                    adapterLocation.SaveComplete += onSaveCompleteHandler;
-                    adapterLocation.SaveError += onSaveErrorHandler;
-                    adapterLocation.setProgress();
-                    
-                    adapterLocation.startSave();
+                            List<string> databases = new List<string>();
+                            List<string> excludedTables = new List<string>();
+                            tableList = new List<string>();
+                            foreach (TreeNode node in tvDatabases.Nodes)
+                            {
+                                if (node.Checked)
+                                {
+                                    databases.Add(node.Text);
+                                    string tables = "";
+                                    foreach (TreeNode childNode in node.Nodes)
+                                    {
+                                        if (!childNode.Checked)
+                                        {
+                                            tables += childNode.Text + ",";
+                                        }
+                                        else
+                                        {
+                                            tableList.Add(childNode.Text);
+                                        }
+                                    }
+                                    if (tables != "")
+                                    {
+                                        tables = tables.Substring(0, tables.Length - 1); //vgazei to teleutaio comma
+                                    }
+                                    excludedTables.Add(tables);
+                                }
+                            }
+                            config.database = databases[0];
+                            config.locationIds = locations.ToArray();
+                            IncrementalUtils iutils = new IncrementalUtils(config);
+                            prefix = iutils.calculatePrefix(0)[1];
+                        });
+                    }
+
+                    saveToLocations(status.fileAbsPath, prefix);
                 }
                 else
                 {
@@ -757,6 +832,49 @@ namespace Firedump
             {
                 this.UseWaitCursor = false;
             }
+        }
+
+        private void onCompletedHandlerBinlog(BinlogDumpResultset status)
+        {
+
+        }
+
+        private void saveToLocations(string fileAbsPath, string prefix)
+        {
+            //EDW KALEITAI TO SAVE STA LOCATIONS
+            List<int> locations = new List<int>();
+            backuplocations = new List<firedumpdbDataSet.backup_locationsRow>();
+            dataGridView1.Invoke((MethodInvoker)delegate ()
+            {
+                dataGridView1.Rows.Clear();
+                dataGridView1.Refresh();
+            });
+
+            this.Invoke((MethodInvoker)delegate ()
+            {
+                progressContainer = new ProgressFormContainer();
+                //progressContainer.Show();
+                foreach (ListViewItem item in lbSaveLocations.Items)
+                {
+                    Object loc = item.Tag;
+                    locations.Add(Convert.ToInt32(((firedumpdbDataSet.backup_locationsRow)loc).id));
+                    backuplocations.Add((firedumpdbDataSet.backup_locationsRow)loc);
+                    addToGridView(loc);
+                }
+
+            });
+
+
+            adapterLocation = new LocationAdapterManager(locations, fileAbsPath, prefix); //fix auto na mpei to prefix
+            adapterLocation.SaveInit += onSaveInitHandler;
+            adapterLocation.InnerSaveInit += onInnerSaveInitHandler;
+            adapterLocation.LocationProgress += onLocationProgressHandler;
+            adapterLocation.SaveProgress += setSaveProgressHandler;
+            adapterLocation.SaveComplete += onSaveCompleteHandler;
+            adapterLocation.SaveError += onSaveErrorHandler;
+            adapterLocation.setProgress();
+
+            adapterLocation.startSave();
         }
 
 

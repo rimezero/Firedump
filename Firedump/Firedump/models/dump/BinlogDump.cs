@@ -49,6 +49,8 @@ namespace Firedump.models.dump
 
         public BinlogDumpResultset executeDump()
         {
+            result = new BinlogDumpResultset();
+            result.wasSuccessful = true;
             StringBuilder arguments = calculateArguments();
 
             if (!result.wasSuccessful)
@@ -146,7 +148,7 @@ namespace Firedump.models.dump
                     result.fileAbsPath = compResult.resultAbsPath;
                 }
             }
-
+            result.incrementalFormatPrefix = config.prefix;
             return result;
         }
 
@@ -181,20 +183,56 @@ namespace Firedump.models.dump
         private StringBuilder calculateArguments()
         {
             StringBuilder arguments = new StringBuilder();
-            checkLogNames();
+            performChecks();
+            if (!result.wasSuccessful)
+            {
+                return arguments;
+            }
+            //-R -h localhost -u root -p --skip-gtids -d "anime" DESKTOP-5TEPA4J-bin.000003
+            arguments.Append("-R ");
+            arguments.Append(" -h "+config.host);
+            arguments.Append(" -u "+config.username);
+            arguments.Append(" -p"+config.password);
+            arguments.Append(" -d "+config.database);
+            arguments.Append(" --start-datetime=\""+config.startDateTime+"\"");
 
-
-
+            //last
+            arguments.Append(" ");
+            foreach (string fname in config.logfiles)
+            {
+                arguments.Append(fname+" ");
+            }
+            Console.WriteLine(arguments.ToString());
 
             return arguments;
         }
 
-        private void checkLogNames()
+        private void performChecks()
         {
-            //if binary log names are not set connect to server and get file names with SHOW BINARY LOGS
+            if (config.logfiles.Length == 0)
+            {
+                result.wasSuccessful = false;
+                result.errorNumber = -2;
+                result.errorMessage = "Binary log file names on server not set.";
+                return;
+            }
+            if (config.locationIds.Length == 0)
+            {
+                result.wasSuccessful = false;
+                result.errorNumber = -2;
+                result.errorMessage = "No save location set.";
+                return;
+            }
 
-            // /connection
-            //check sto filesystem gia na vrei startdate an den iparxei kataligo proigoumeno backup vazei fail sto result
+            IncrementalUtils iutils = new IncrementalUtils(config);
+            config = iutils.calculateDumpConfig();
+            if (config.prefix.StartsWith("FB_0.0.0"))
+            {
+                result.wasSuccessful = false;
+                result.errorNumber = -2;
+                result.errorMessage = "No previous backups found in save locations. Unable to execute incremental backup.";
+                return;
+            }
         }
     }
 }

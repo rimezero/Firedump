@@ -43,8 +43,10 @@ namespace Firedump.models.dump
             {
                 bpType = 2;
             }
-            retConfig.prefix = calculatePrefix(bpType);
-
+            string[] res = calculatePrefix(bpType);
+            retConfig.prefix = res[1];
+            retConfig.startDateTime = res[0].Replace(',',':'); //replacing : because it is invalid in filenames
+            //retConfig.prefix += "_" + dbcon.getCurrentDatetime().Replace(':',',');
             return retConfig;
         }
 
@@ -53,13 +55,13 @@ namespace Firedump.models.dump
         /// </summary>
         /// <param name="bpType">0 = Full Backup 1 = Incremental Backup 2 = Incremental Delta</param>
         /// <returns></returns>
-        public string calculatePrefix(int bpType)
+        public string[] calculatePrefix(int bpType)
         {
             string prefix="";
             //<filename_prefix>
             firedumpdbDataSetTableAdapters.backup_locationsTableAdapter adapter = new firedumpdbDataSetTableAdapters.backup_locationsTableAdapter();
             List<firedumpdbDataSet.backup_locationsRow> locations = new List<firedumpdbDataSet.backup_locationsRow>();
-            foreach (int id in config.locationIds)
+            foreach (int id in locationIds)
             {
                 locations.Add(adapter.GetDataByID(id)[0]);
             }
@@ -74,7 +76,7 @@ namespace Firedump.models.dump
                 }
             }
 
-            List<string> bpIndexes = new List<string>();
+            List<string[]> splitBpFnames = new List<string[]>();
             if (index == -1)
             {
                 //periptwsi p den iparxei save location local fix argotera
@@ -92,26 +94,40 @@ namespace Firedump.models.dump
                 {
                     fnames.Add(fname.Replace(splitpath[0], ""));
                 }
-                bpIndexes = getBpIndexes(fnames, splitpath[1]);
+                splitBpFnames = getSplitBpFnames(fnames, splitpath[1]);
                 
                 //Console.WriteLine("path "+splitpath[0]);
                 //Console.WriteLine("filename " + splitpath[1]);
             }
-
-            if (bpIndexes.Count() > 0)
+            string[] res = new string[2];
+            if (splitBpFnames.Count() > 0)
             {
-                prefix += findNext(bpIndexes, bpType);
+                res = findNext(splitBpFnames, bpType);
+                prefix += res[1];
             }
             else
             {
                 prefix += "FB_0.0.0";
             }
+
+            MySQLCredentialsConfig myconfig = new MySQLCredentialsConfig();
+            myconfig.host = config.host;
+            myconfig.port = config.port;
+            myconfig.username = config.username;
+            myconfig.password = config.password;
+            myconfig.database = config.database;
+            DbConnection dbcon = new DbConnection(myconfig);
+            prefix += "_" + dbcon.getCurrentDatetime().Replace(':', ',');
+            //prefix += "_" + DateTime.Now.ToString("yyyy-M-d hh:mm:ss"); has to come from the mysql server
+            //calculate datetime and add it to prefix in binlog required format
+
             //</filename_prefix>
 
-            return prefix;
+            res[1] = prefix;
+            return res;
         }
 
-        private List<string> getBpIndexes(List<string> fnames, string splitName)
+        private List<string[]> getSplitBpFnames(List<string> fnames, string splitName)
         {  
             List<string> backupFiles = new List<string>();
             foreach (string fname in fnames)
@@ -127,6 +143,14 @@ namespace Firedump.models.dump
             {
                 splitBpFnames.Add(fname.Split('_'));
             }
+            
+            return splitBpFnames;
+        }
+
+        private string[] findNext(List<string[]> splitBpFnames, int bpType)
+        {
+            string[] restable = new string[2];
+            string nextprefix = "";
             List<string> bpIndexes = new List<string>();
             foreach (string[] splitBpFname in splitBpFnames)
             {
@@ -135,12 +159,6 @@ namespace Firedump.models.dump
                     bpIndexes.Add(splitBpFname[2]);
                 }
             }
-            return bpIndexes;
-        }
-
-        private string findNext(List<string> bpIndexes,int bpType)
-        {
-            string nextprefix = "";
             List<string[]> splitIndexes = new List<string[]>();
             foreach (string bpIndex in bpIndexes)
             {
@@ -177,6 +195,7 @@ namespace Firedump.models.dump
                     }
                 }
             }
+            //se periptwsi incremental na pernei san start date to startdate tou proigoumenou full backup k oxi tou max !!
             int iMaxA = Convert.ToInt32(splitIndexes[maxindex][0]);
             int iMaxB = Convert.ToInt32(splitIndexes[maxindex][1]);
             int iMaxC = Convert.ToInt32(splitIndexes[maxindex][2]);
@@ -198,8 +217,9 @@ namespace Firedump.models.dump
 
                     break;
             }
-
-            return nextprefix;
+            restable[0] = splitBpFnames[maxindex][3].Split('.')[0];
+            restable[1] = nextprefix;
+            return restable;
         }
 
         /// <summary>

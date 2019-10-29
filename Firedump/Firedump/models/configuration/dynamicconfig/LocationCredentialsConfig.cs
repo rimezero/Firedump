@@ -10,5 +10,6 @@ namespace Firedump.models.configuration.dynamicconfig
     {
         public string sourcePath { set; get; }
         public string locationPath { set; get; }
+        public string fnamePrefix { set; get; }
     }
 }

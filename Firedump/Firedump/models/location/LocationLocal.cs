@@ -46,6 +46,10 @@ namespace Firedump.models.location
                 string[] path = config.sourcePath.Split('\\');
                 string filename = path[path.Length - 1];
                 string[] temp = filename.Split('.'); //pernei to extension apo to sourcepath kai na to kanei append sto location
+                if (config.fnamePrefix!=null)
+                {
+                    config.locationPath += "_" + config.fnamePrefix;
+                }
                 config.locationPath = config.locationPath + "." + temp[temp.Length - 1];
                 temp = config.locationPath.Split('\\');
                 string directorypath = "";
