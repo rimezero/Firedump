@@ -181,7 +181,7 @@ namespace Firedump.models.dump
         private StringBuilder calculateArguments()
         {
             StringBuilder arguments = new StringBuilder();
-            calculateStartDate();
+            checkLogNames();
 
 
 
@@ -189,7 +189,7 @@ namespace Firedump.models.dump
             return arguments;
         }
 
-        private void calculateStartDate()
+        private void checkLogNames()
         {
             //if binary log names are not set connect to server and get file names with SHOW BINARY LOGS
 

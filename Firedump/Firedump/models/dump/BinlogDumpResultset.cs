@@ -16,8 +16,11 @@ namespace Firedump.models.dump
         /// absolute path of the temporal dump file (use if the dump was successful to get the path to the saved file)
         /// </summary>
         public string fileAbsPath { set; get; }
-        public string startdate { set; get; }
-        public string enddate { set; get; }
+        /// <summary>
+        /// The incremental prefix for the filename
+        /// example: FB_1.0.0_date || IB_1.2.0 || IDB_1.2.5
+        /// </summary>
+        public string incrementalFormatPrefix { set; get; }
         /// <summary>
         /// -1 - obvious mistake in credentials (Message in errorMessage). -2 - mysqldump.exe exited with exit
         /// code diffent from 0 (use mysqldumpexeStandardError). -3 compression failed mysqldumpexeStandardError

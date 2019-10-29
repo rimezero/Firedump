@@ -29,6 +29,7 @@ namespace Firedump
         private firedumpdbDataSetTableAdapters.mysql_serversTableAdapter mysql_serversAdapter = new firedumpdbDataSetTableAdapters.mysql_serversTableAdapter();
         private List<firedumpdbDataSet.backup_locationsRow> backuplocations;
         private LocationAdapterManager adapterLocation;
+        private BinlogDumpAdapter logadapter;
         private MySqlDumpAdapter adapter;
         private List<string> databaseList;
         private List<String> tableList = new List<string>();
@@ -424,6 +425,35 @@ namespace Firedump
             config.port = unchecked((int)(long)serverData.Rows[cmbServers.SelectedIndex]["port"]);
             config.username = (string)serverData.Rows[cmbServers.SelectedIndex]["username"];
             config.password = (string)serverData.Rows[cmbServers.SelectedIndex]["password"];
+
+            //testing
+            BinlogDumpCredentialsConfig configtest1 = new BinlogDumpCredentialsConfig();
+            configtest1.host = config.host;
+            configtest1.port = config.port;
+            configtest1.username = config.username;
+            configtest1.password = config.password;
+
+            backuplocations = new List<firedumpdbDataSet.backup_locationsRow>();
+            List<int> locationIds = new List<int>();
+            foreach (ListViewItem item in lbSaveLocations.Items)
+            {
+                Object loc = item.Tag;
+                backuplocations.Add((firedumpdbDataSet.backup_locationsRow)loc);
+                locationIds.Add((int)((firedumpdbDataSet.backup_locationsRow)loc).id);
+            }
+            configtest1.locationIds = locationIds.ToArray();
+            configtest1.isIncrementalDelta = true;
+            IncrementalUtils iutils = new IncrementalUtils(configtest1);
+            configtest1 = iutils.calculateDumpConfig();
+
+            foreach (string logfile in configtest1.logfiles)
+            {
+                Console.WriteLine(logfile);
+            }
+            Console.WriteLine("Next prefix: "+configtest1.prefix);
+            bool a = true; //gia na mi vgazei unreachable code apo katw
+            if(a) return;
+            // /testing
 
             if (databases.Count == 0)
             {
@@ -1101,6 +1131,13 @@ namespace Firedump
                 progressContainer.Visible = true;
                 progressContainer.Show();
             }
+        }
+
+        private void cIncrementalFormat_CheckedChanged(object sender, EventArgs e)
+        {
+            rbFull.Enabled = cIncrementalFormat.Checked;
+            rbInc.Enabled = cIncrementalFormat.Checked;
+            rbIncDelta.Enabled = cIncrementalFormat.Checked;
         }
     }
 }

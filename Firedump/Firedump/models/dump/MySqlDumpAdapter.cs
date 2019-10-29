@@ -63,7 +63,7 @@ namespace Firedump.models.dump
             TableStartDump?.Invoke(table);
         }
 
-        //onCompressStart
+        //onTableRowCount
         public delegate void tableRowCount(int rowcount);
         public event tableRowCount TableRowCount;
         private void onTableRowCount(int rowcount)

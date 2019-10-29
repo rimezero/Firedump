@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Firedump.models.configuration.dynamicconfig;
 using MySql.Data;
 using MySql.Data.MySqlClient;
 
@@ -14,6 +15,15 @@ namespace Firedump.models.databaseUtils
 
         public DbConnection() {
             port = 3306;
+        }
+
+        public DbConnection(MySQLCredentialsConfig config)
+        {
+            Host = config.host;
+            port = config.port;
+            username = config.username;
+            password = config.password;
+            database = config.database;
         }
 
         //den prepei na einai singleton auto me tpt mporei na ginonte taftoxrona connections se diaforous server
@@ -187,6 +197,55 @@ namespace Firedump.models.databaseUtils
             }
 
             return databases;
+        }
+
+        public List<string> getBinlogfilenames()
+        {
+            connection = new MySqlConnection(conStringBuilder());
+            connection.Open();
+            List<string> logfilenames = new List<string>();
+
+            string query = "show binary logs;";
+            MySqlCommand command = new MySqlCommand(query, connection);
+            
+            try
+            {
+                MySqlDataReader reader = command.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    logfilenames.Add(reader.GetString(0));
+                }
+            }
+            catch (MySqlException ex)
+            {
+                string sqlErrorMessage = "Message: " + ex.Message + "\n" + "Source: " + ex.Source + "\n" + "Number: " + ex.Number;
+                Console.WriteLine(sqlErrorMessage);
+                logfilenames.Add("Error");
+                logfilenames.Add(sqlErrorMessage);
+                switch (ex.Number)
+                {
+                    //http://dev.mysql.com/doc/refman/5.0/en/error-messages-server.html
+                    case 1227:
+                        Console.WriteLine("Access denied; you need the SUPER,REPLICATION CLIENT privilege for this operation");
+                        logfilenames.Add("Access denied; you need the SUPER,REPLICATION CLIENT privilege for this operation");
+                        break;
+                    case 1381: // 
+                        Console.WriteLine("You are not using binary logging");
+                        logfilenames.Add("You are not using binary logging");
+                        break;
+                    default:
+                        break;
+                }
+
+            }
+
+            if (connection.State == ConnectionState.Open)
+            {
+                connection.Close();
+            }
+
+            return logfilenames;
         }
 
         /// <summary>

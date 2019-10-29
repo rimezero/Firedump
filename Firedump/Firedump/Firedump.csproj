@@ -243,7 +243,10 @@
     <Compile Include="models\configuration\dynamicconfig\FTPCredentialsConfig.cs" />
     <Compile Include="models\configuration\dynamicconfig\ImportCredentialsConfig.cs" />
     <Compile Include="models\configuration\dynamicconfig\LocationCredentialsConfig.cs" />
+    <Compile Include="models\configuration\dynamicconfig\MySQLCredentialsConfig.cs" />
+    <Compile Include="models\dump\IncrementalUtils.cs" />
     <Compile Include="models\dump\BinlogDump.cs" />
+    <Compile Include="models\dump\BinlogDumpAdapter.cs" />
     <Compile Include="models\dump\BinlogDumpResultset.cs" />
     <Compile Include="models\dump\CompressionAdapter.cs" />
     <Compile Include="models\pojos\JobDetail.cs" />
@@ -417,7 +420,6 @@
     </Compile>
     <Compile Include="models\databaseUtils\SqlUtils.cs" />
     <Compile Include="utils\EncryptionUtils.cs" />
-    <Compile Include="utils\MySQLUtils.cs" />
     <Compile Include="utils\OS.cs" />
     <Compile Include="utils\StringUtils.cs" />
     <EmbeddedResource Include="Forms\AboutForm.resx">

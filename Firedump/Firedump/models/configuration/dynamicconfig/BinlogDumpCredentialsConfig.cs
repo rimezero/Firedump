@@ -19,14 +19,8 @@ namespace Firedump.models.configuration.dynamicconfig
         /// <summary>
         /// True does an incremental delta otherwise does an incremental backup
         /// </summary>
-        public bool isIncrementalDelta { set; get; }
-        /// <summary>
-        /// the folder path of the save location 
-        /// </summary>
-        public string path { set; get; }
-        /// <summary>
-        /// 0 for local 1 for ftp
-        /// </summary>
-        public int locationType { set; get; }
+        public bool isIncrementalDelta { set; get; } = false;
+        public string prefix { set; get; }
+        public int[] locationIds { set; get; }
     }
 }
