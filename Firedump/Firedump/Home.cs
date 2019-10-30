@@ -425,14 +425,24 @@ namespace Firedump
                     excludedTables.Add(tables);
                 }
             }
-            /*
+            
             //testing
+            /*
+            IncrementalUtils testutils = new IncrementalUtils();
+            List<string> chain = testutils.calculateChain("D:\\MyStuff\\Backups\\dumps\\test\\testdumpinc_IDB_0.2.2_2019-10-30 17,50,46", -1);
+            foreach (string chainfname in chain)
+            {
+                Console.WriteLine("chain: "+chainfname);
+            }
+            bool b = true; //gia na mi vgazei unreachable code apo katw
+            if (b) return;*/
+            /*
             BinlogDumpCredentialsConfig configtest1 = new BinlogDumpCredentialsConfig();
             configtest1.host = (string)serverData.Rows[cmbServers.SelectedIndex]["host"];
             configtest1.port = unchecked((int)(long)serverData.Rows[cmbServers.SelectedIndex]["port"]);
             configtest1.username = (string)serverData.Rows[cmbServers.SelectedIndex]["username"];
             configtest1.password = (string)serverData.Rows[cmbServers.SelectedIndex]["password"];
-
+            
             backuplocations = new List<firedumpdbDataSet.backup_locationsRow>();
             List<int> locationIds1 = new List<int>();
             foreach (ListViewItem item in lbSaveLocations.Items)
@@ -519,6 +529,7 @@ namespace Firedump
                 config.username = (string)serverData.Rows[cmbServers.SelectedIndex]["username"];
                 config.password = (string)serverData.Rows[cmbServers.SelectedIndex]["password"];
                 config.database = databases[0]; //if here only one database is selected due to above checks
+                config.isIncrementalDelta = rbIncDelta.Checked;
 
                 backuplocations = new List<firedumpdbDataSet.backup_locationsRow>();
                 List<int> locationIds = new List<int>();

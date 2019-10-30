@@ -1,8 +1,10 @@
 ﻿using Firedump.Forms.location;
 using Firedump.models.configuration.dynamicconfig;
 using Firedump.models.databaseUtils;
+using Firedump.models.dump;
 using Firedump.models.location;
 using Firedump.models.sqlimport;
+using Firedump.utils;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -25,6 +27,7 @@ namespace Firedump.Forms.sqlimport
         private bool isCompressed;
         private bool isEncrypted;
         private TextBox tb = new TextBox();
+        private List<string> pathsToImport = null;
         public ImportSQL()
         {
             InitializeComponent();
@@ -285,6 +288,39 @@ namespace Firedump.Forms.sqlimport
         private void bStartImport_Click(object sender, EventArgs e)
         {
             if (!performChecks()) return;
+            string path = tb.Text;
+
+            //incremental chain
+            if (cImportChain.Checked && pathsToImport==null)
+            {
+                IncrementalUtils iutils = new IncrementalUtils();
+                int isLocalInt = -1;
+                if (!isLocal)
+                {
+                    isLocalInt = 1;
+                }
+                pathsToImport = iutils.calculateChain(tb.Text,isLocalInt);
+                if (pathsToImport[0].StartsWith("Error"))
+                {
+                    MessageBox.Show(pathsToImport[0], "Chain Import", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+                path = pathsToImport[0];
+                foreach (string ptoimp in pathsToImport)
+                {
+                    Console.WriteLine("path to import: "+ptoimp);
+                }
+            }
+            else if (cImportChain.Checked && pathsToImport != null)
+            {
+                if (pathsToImport.Count()==0)
+                {
+                    return;
+                }
+                path = pathsToImport[0];
+            }
+
+            Console.WriteLine("Importing path: "+path);
 
             this.UseWaitCursor = true;
             bStartImport.Enabled = false;
@@ -302,7 +338,7 @@ namespace Firedump.Forms.sqlimport
             config.username = (string)serverdata["username"];
             config.scriptDelimeter = tbDelimeter.Text;
 
-            adapter = new ImportAdapterManager(tb.Text,isLocal,isCompressed,isEncrypted,tbConfirmPass.Text,location,config);
+            adapter = new ImportAdapterManager(path,isLocal,isCompressed,isEncrypted,tbConfirmPass.Text,location,config);
             adapter.ImportComplete += onImportCompleteHandler;
             adapter.ImportInit += onImportInitHandler;
             adapter.ImportError += onImportErrorHandler;
@@ -359,12 +395,33 @@ namespace Firedump.Forms.sqlimport
                 pbMainProgress.Maximum = maxprogress;
                 lbSpeed.Visible = false;
                 lbSpeed.Text = "";
-                lStatus.Text = "Status: Executing sql file...";
+                string path = tb.Text;
+                if (cImportChain.Checked && pathsToImport!=null)
+                {
+                    path = pathsToImport[0];
+                }
+                lStatus.Text = "Status: Executing sql file "+StringUtils.splitPath(path)[1]+" ...";
             });
         }
 
         private void onImportCompleteHandler(ImportResultSet result)
         {
+            if (cImportChain.Checked)
+            {
+                pathsToImport.RemoveAt(0);
+                if (pathsToImport.Count() == 0)
+                {
+                    pathsToImport = null;
+                }
+                else
+                {                  
+                    this.Invoke((MethodInvoker)delegate () {
+                        bStartImport_Click(null, null);
+                    });
+                    return;
+                }
+            }
+
             this.UseWaitCursor = false;
             this.Invoke((MethodInvoker)delegate () {
                 pbMainProgress.Value = pbMainProgress.Maximum;

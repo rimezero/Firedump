@@ -8,6 +8,24 @@ namespace Firedump.utils
 {
     public class StringUtils
     {
+        public static int indexOfContained(List<string> list, string containedString)
+        {
+            int index = -1;
+            if (list==null || list.Count()==0)
+            {
+                return index;
+            }
+            int i = 0;
+            while (i < list.Count() && index==-1)
+            {
+                if (list[i].Contains(containedString))
+                {
+                    index = i;
+                }
+                i++;
+            }
+            return index;
+        }
 
         /// <summary>
         /// Works for both paths with \ and /

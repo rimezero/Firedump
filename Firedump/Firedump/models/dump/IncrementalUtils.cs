@@ -94,7 +94,7 @@ namespace Firedump.models.dump
                 {
                     fnames.Add(fname.Replace(splitpath[0], ""));
                 }
-                splitBpFnames = getSplitBpFnames(fnames, splitpath[1]);
+                splitBpFnames = getSplitBpFnames(fnames, splitpath[1].Split('_')[0]);
                 
                 //Console.WriteLine("path "+splitpath[0]);
                 //Console.WriteLine("filename " + splitpath[1]);
@@ -249,7 +249,24 @@ namespace Firedump.models.dump
         {
             List<string> filesChain = new List<string>();
 
-            string[] filesindir;
+            string[] tmp = StringUtils.splitPath(path);
+            string initpath = tmp[0];
+            string initfname = tmp[1];
+
+            if (initfname.Contains("_FB_")) //is full backup
+            {
+                filesChain.Add(path);
+                return filesChain;
+            }
+
+            if (!initfname.Contains("_FB_") && !initfname.Contains("_IB_") && !initfname.Contains("_IDB_")) // file has no incremental format
+            {
+                filesChain.Add(path);
+                return filesChain;
+            }
+
+            string initfnamecut = tmp[1].Split('_')[0];
+            string[] filesindir = new string[1];
             if (locid!=-1)
             {
                 firedumpdbDataSetTableAdapters.backup_locationsTableAdapter adapter = new firedumpdbDataSetTableAdapters.backup_locationsTableAdapter();
@@ -257,7 +274,7 @@ namespace Firedump.models.dump
                 switch (location.service_type)
                 {
                     case 0: //Local
-                        filesindir = Directory.GetFiles(path);
+                        filesindir = Directory.GetFiles(initpath);
                         break;
                     case 1: //FTP
                         //connect k directory listing
@@ -272,10 +289,66 @@ namespace Firedump.models.dump
             }
             else
             {
-                filesindir = Directory.GetFiles(path);
+                filesindir = Directory.GetFiles(initpath);
+            }
+            List<string> fnames = new List<string>();
+            foreach (string fpath in filesindir)
+            {
+                fnames.Add(fpath.Replace(initpath,""));
+            }
+            List<string> bpFnames = new List<string>();
+            foreach (string fname in fnames)
+            {
+                if (fname.Contains(initfnamecut) && fname.Contains("_"))
+                {
+                    bpFnames.Add(fname);
+                }
             }
 
-             
+            if (bpFnames.Count()<2)
+            {
+                filesChain.Add("Error:No previous files in chain for incremental backup.");
+                return filesChain;
+            }
+
+            string[] splitinitbpindexes = initfname.Split('_')[2].Split('.'); //0.0.0
+
+            int indexC = Convert.ToInt32(splitinitbpindexes[2]);
+
+            List<int> chainedIndexes = new List<int>();
+            int idx = StringUtils.indexOfContained(bpFnames,splitinitbpindexes[0]+"."+"0.0");
+            if (idx!=-1)
+            {
+                filesChain.Add(initpath + bpFnames[idx]);
+            }
+            else
+            {
+                filesChain = new List<string>();
+                filesChain.Add("Error:Missing file with version: " + splitinitbpindexes[0] + ".0.0" + " from the incremental chain");
+                return filesChain;
+            }
+            if (indexC>0)
+            {
+                for (int i=0; i<=indexC; i++)
+                {
+                    idx = StringUtils.indexOfContained(bpFnames,splitinitbpindexes[0]+"."+splitinitbpindexes[1]+"."+i);
+                    if (idx!=-1)
+                    {
+                        filesChain.Add(initpath+bpFnames[idx]);
+                    }
+                    else
+                    {
+                        filesChain = new List<string>();
+                        filesChain.Add("Error:Missing file with version: "+ splitinitbpindexes[0] + "." + splitinitbpindexes[1] + "." + i +" from the incremental chain");
+                        return filesChain;
+                    }
+                }
+            }
+            else
+            {
+                filesChain.Add(path);
+            }
+
             return filesChain;
         }
     }
