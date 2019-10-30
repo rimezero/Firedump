@@ -240,14 +240,42 @@ namespace Firedump.models.dump
         }
 
         /// <summary>
-        /// Logic that calculates filename chains for incremental backups
+        /// 
         /// </summary>
-        /// <param name="filename">The name of the backup file</param>
-        /// <returns>A list of the filenames in the restore chain or error for first element and a message for second</returns>
-        public List<string> calculateChain(string filename)
+        /// <param name="path"></param>
+        /// <param name="locid">-1 for local path or the id of the save location</param>
+        /// <returns>List of full paths for all files in the import chain in order</returns>
+        public List<string> calculateChain(string path, int locid)
         {
             List<string> filesChain = new List<string>();
 
+            string[] filesindir;
+            if (locid!=-1)
+            {
+                firedumpdbDataSetTableAdapters.backup_locationsTableAdapter adapter = new firedumpdbDataSetTableAdapters.backup_locationsTableAdapter();
+                firedumpdbDataSet.backup_locationsRow location = adapter.GetDataByID(locid)[0];
+                switch (location.service_type)
+                {
+                    case 0: //Local
+                        filesindir = Directory.GetFiles(path);
+                        break;
+                    case 1: //FTP
+                        //connect k directory listing
+                        break;
+                    case 2: //dropbox
+                        break;
+                    case 3: //google drive
+                        break;
+                    default:
+                        break;
+                }
+            }
+            else
+            {
+                filesindir = Directory.GetFiles(path);
+            }
+
+             
             return filesChain;
         }
     }
