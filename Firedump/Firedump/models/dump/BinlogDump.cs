@@ -206,11 +206,23 @@ namespace Firedump.models.dump
 
             return arguments;
         }
+        /*
+         * [mysqld] ubuntu mysql server config
+        default-time-zone='+02:00'
+        server-id               = 1
+        log_bin                 = /var/log/mysql/mysql-bin.log
+        log-bin-index           = /var/log/mysql/bin-log.index
+        expire_logs_days        = 30
+        max_binlog_size   = 100M
+        binlog_format=row
+
+        */
+
 
         private void performChecks()
         {
             
-            if (config.locationIds?.Length == 0)
+            if (config.locationIds==null || config.locationIds.Length == 0)
             {
                 result.wasSuccessful = false;
                 result.errorNumber = -2;
@@ -220,11 +232,32 @@ namespace Firedump.models.dump
 
             IncrementalUtils iutils = new IncrementalUtils(config);
             config = iutils.calculateDumpConfig();
-            if (config.logfiles?.Length == 0)
+            if (config.logfiles==null || config.logfiles.Length == 0)
             {
                 result.wasSuccessful = false;
                 result.errorNumber = -2;
                 result.errorMessage = "Binary log file names on server not set.";
+                return;
+            }
+            if (config.logfiles[0]=="Error")
+            {
+                result.wasSuccessful = false;
+                result.errorNumber = -2;
+                result.errorMessage = config.logfiles[1];
+                return;
+            }
+            if (config.prefix == null )
+            {
+                result.wasSuccessful = false;
+                result.errorNumber = -2;
+                result.errorMessage = "Filename prefix is null.";
+                return;
+            }
+            if (config.prefix.StartsWith("Error"))
+            {
+                result.wasSuccessful = false;
+                result.errorNumber = -2;
+                result.errorMessage = config.prefix;
                 return;
             }
             if (config.prefix.StartsWith("FB_0.0.0"))

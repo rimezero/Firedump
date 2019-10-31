@@ -551,6 +551,7 @@ namespace Firedump
                 logadapter.Completed += onCompletedHandlerBinlog;
                 logadapter.CompressProgress += compressProgressHandler;
                 logadapter.CompressStart += onCompressStartHandler;
+                logadapter.Progress += onProgressHandler;
                 logadapter.Error += onErrorHandler;
                 //handlers
 
@@ -812,15 +813,15 @@ namespace Firedump
                     string errorMessage = "";
                     switch (status.errorNumber)
                     {
-                        case 1:
+                        case -1:
                             errorMessage = "Connection credentials not set correctly:\n"+status.errorMessage;
                             Console.WriteLine(errorMessage);
                             break;
-                        case 2:
+                        case -2:
                             errorMessage = "MySQL dump failed:\n" + status.mysqldumpexeStandardError;
                             Console.WriteLine(errorMessage);
                             break;
-                        case 3:
+                        case -3:
                             errorMessage = "Compression failed:\n" + status.mysqldumpexeStandardError;
                             Console.WriteLine(errorMessage);
                             break;
@@ -870,15 +871,15 @@ namespace Firedump
                     string errorMessage = "";
                     switch (status.errorNumber)
                     {
-                        case 1:
+                        case -1:
                             errorMessage = "Connection credentials not set correctly:\n" + status.errorMessage;
                             Console.WriteLine(errorMessage);
                             break;
-                        case 2:
+                        case -2:
                             errorMessage = "Binlog dump failed:\n" + status.mysqlbinlogexeStandardError;
                             Console.WriteLine(errorMessage);
                             break;
-                        case 3:
+                        case -3:
                             errorMessage = "Compression failed:\n" + status.mysqlbinlogexeStandardError;
                             Console.WriteLine(errorMessage);
                             break;

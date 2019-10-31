@@ -96,6 +96,7 @@ namespace Firedump.models.sqlimport
                 ImportResultSet result;
                 innertask.Start();
                 result = await innertask;
+                innertask.Dispose();
 
                 onImportProgress(commandsCount);
                 onImportComplete(result);

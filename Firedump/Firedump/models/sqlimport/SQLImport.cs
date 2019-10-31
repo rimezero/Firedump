@@ -147,6 +147,7 @@ namespace Firedump.models.sqlimport
                     //Console.WriteLine("Log file line: "+line);
                 }
                 proc.StandardInput.Close(); //ama den ginei auto perimenei endlessly gia input
+                sr.Close();
             }catch(Exception ex)
             {
                 result.wasSuccessful = false;

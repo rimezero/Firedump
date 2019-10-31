@@ -43,10 +43,18 @@ namespace Firedump.models.dump
             {
                 bpType = 2;
             }
-            string[] res = calculatePrefix(bpType);
-            retConfig.prefix = res[1];
-            retConfig.startDateTime = res[0].Replace(',',':'); //replacing : because it is invalid in filenames
-            //retConfig.prefix += "_" + dbcon.getCurrentDatetime().Replace(':',',');
+            try
+            {
+                string[] res = calculatePrefix(bpType);
+                retConfig.prefix = res[1];
+                retConfig.startDateTime = res[0].Replace(',', ':'); //replacing : because it is invalid in filenames
+                                                                    //retConfig.prefix += "_" + dbcon.getCurrentDatetime().Replace(':',',');
+            }
+            catch (Exception ex)
+            {
+                retConfig.prefix = "Error calculating filename prefix: " + ex.Message;
+                Console.WriteLine(ex.StackTrace);
+            }
             return retConfig;
         }
 
@@ -117,8 +125,8 @@ namespace Firedump.models.dump
             myconfig.password = config.password;
             myconfig.database = config.database;
             DbConnection dbcon = new DbConnection(myconfig);
-            prefix += "_" + dbcon.getCurrentDatetime().Replace(':', ',');
-            //prefix += "_" + DateTime.Now.ToString("yyyy-M-d hh:mm:ss"); has to come from the mysql server
+            //prefix += "_" + dbcon.getCurrentDatetime().Replace(':', ',');
+            prefix += "_" + DateTime.Now.ToString("yyyy-M-d HH:mm:ss").Replace(':', ',');
             //calculate datetime and add it to prefix in binlog required format
 
             //</filename_prefix>
@@ -248,105 +256,114 @@ namespace Firedump.models.dump
         public List<string> calculateChain(string path, int locid)
         {
             List<string> filesChain = new List<string>();
+            try
+            {  
 
-            string[] tmp = StringUtils.splitPath(path);
-            string initpath = tmp[0];
-            string initfname = tmp[1];
+                string[] tmp = StringUtils.splitPath(path);
+                string initpath = tmp[0];
+                string initfname = tmp[1];
 
-            if (initfname.Contains("_FB_")) //is full backup
-            {
-                filesChain.Add(path);
-                return filesChain;
-            }
-
-            if (!initfname.Contains("_FB_") && !initfname.Contains("_IB_") && !initfname.Contains("_IDB_")) // file has no incremental format
-            {
-                filesChain.Add(path);
-                return filesChain;
-            }
-
-            string initfnamecut = tmp[1].Split('_')[0];
-            string[] filesindir = new string[1];
-            if (locid!=-1)
-            {
-                firedumpdbDataSetTableAdapters.backup_locationsTableAdapter adapter = new firedumpdbDataSetTableAdapters.backup_locationsTableAdapter();
-                firedumpdbDataSet.backup_locationsRow location = adapter.GetDataByID(locid)[0];
-                switch (location.service_type)
+                if (initfname.Contains("_FB_")) //is full backup
                 {
-                    case 0: //Local
-                        filesindir = Directory.GetFiles(initpath);
-                        break;
-                    case 1: //FTP
-                        //connect k directory listing
-                        break;
-                    case 2: //dropbox
-                        break;
-                    case 3: //google drive
-                        break;
-                    default:
-                        break;
+                    filesChain.Add(path);
+                    return filesChain;
                 }
-            }
-            else
-            {
-                filesindir = Directory.GetFiles(initpath);
-            }
-            List<string> fnames = new List<string>();
-            foreach (string fpath in filesindir)
-            {
-                fnames.Add(fpath.Replace(initpath,""));
-            }
-            List<string> bpFnames = new List<string>();
-            foreach (string fname in fnames)
-            {
-                if (fname.Contains(initfnamecut) && fname.Contains("_"))
+
+                if (!initfname.Contains("_FB_") && !initfname.Contains("_IB_") && !initfname.Contains("_IDB_")) // file has no incremental format
                 {
-                    bpFnames.Add(fname);
+                    filesChain.Add(path);
+                    return filesChain;
                 }
-            }
 
-            if (bpFnames.Count()<2)
-            {
-                filesChain.Add("Error:No previous files in chain for incremental backup.");
-                return filesChain;
-            }
-
-            string[] splitinitbpindexes = initfname.Split('_')[2].Split('.'); //0.0.0
-
-            int indexC = Convert.ToInt32(splitinitbpindexes[2]);
-
-            List<int> chainedIndexes = new List<int>();
-            int idx = StringUtils.indexOfContained(bpFnames,splitinitbpindexes[0]+"."+"0.0");
-            if (idx!=-1)
-            {
-                filesChain.Add(initpath + bpFnames[idx]);
-            }
-            else
-            {
-                filesChain = new List<string>();
-                filesChain.Add("Error:Missing file with version: " + splitinitbpindexes[0] + ".0.0" + " from the incremental chain");
-                return filesChain;
-            }
-            if (indexC>0)
-            {
-                for (int i=0; i<=indexC; i++)
+                string initfnamecut = tmp[1].Split('_')[0];
+                string[] filesindir = new string[1];
+                if (locid != -1)
                 {
-                    idx = StringUtils.indexOfContained(bpFnames,splitinitbpindexes[0]+"."+splitinitbpindexes[1]+"."+i);
-                    if (idx!=-1)
+                    firedumpdbDataSetTableAdapters.backup_locationsTableAdapter adapter = new firedumpdbDataSetTableAdapters.backup_locationsTableAdapter();
+                    firedumpdbDataSet.backup_locationsRow location = adapter.GetDataByID(locid)[0];
+                    switch (location.service_type)
                     {
-                        filesChain.Add(initpath+bpFnames[idx]);
-                    }
-                    else
-                    {
-                        filesChain = new List<string>();
-                        filesChain.Add("Error:Missing file with version: "+ splitinitbpindexes[0] + "." + splitinitbpindexes[1] + "." + i +" from the incremental chain");
-                        return filesChain;
+                        case 0: //Local
+                            filesindir = Directory.GetFiles(initpath);
+                            break;
+                        case 1: //FTP
+                                //connect k directory listing
+                            break;
+                        case 2: //dropbox
+                            break;
+                        case 3: //google drive
+                            break;
+                        default:
+                            break;
                     }
                 }
+                else
+                {
+                    filesindir = Directory.GetFiles(initpath);
+                }
+                List<string> fnames = new List<string>();
+                foreach (string fpath in filesindir)
+                {
+                    fnames.Add(fpath.Replace(initpath, ""));
+                }
+                List<string> bpFnames = new List<string>();
+                foreach (string fname in fnames)
+                {
+                    if (fname.Contains(initfnamecut) && fname.Contains("_"))
+                    {
+                        bpFnames.Add(fname);
+                    }
+                }
+
+                if (bpFnames.Count() < 2)
+                {
+                    filesChain.Add("Error:No previous files in chain for incremental backup.");
+                    return filesChain;
+                }
+
+                string[] splitinitbpindexes = initfname.Split('_')[2].Split('.'); //0.0.0
+
+                int indexC = Convert.ToInt32(splitinitbpindexes[2]);
+
+                List<int> chainedIndexes = new List<int>();
+                int idx = StringUtils.indexOfContained(bpFnames, splitinitbpindexes[0] + "." + "0.0");
+                if (idx != -1)
+                {
+                    filesChain.Add(initpath + bpFnames[idx]);
+                }
+                else
+                {
+                    filesChain = new List<string>();
+                    filesChain.Add("Error:Missing file with version: " + splitinitbpindexes[0] + ".0.0" + " from the incremental chain");
+                    return filesChain;
+                }
+                if (indexC > 0)
+                {
+                    for (int i = 0; i <= indexC; i++)
+                    {
+                        idx = StringUtils.indexOfContained(bpFnames, splitinitbpindexes[0] + "." + splitinitbpindexes[1] + "." + i);
+                        if (idx != -1)
+                        {
+                            filesChain.Add(initpath + bpFnames[idx]);
+                        }
+                        else
+                        {
+                            filesChain = new List<string>();
+                            filesChain.Add("Error:Missing file with version: " + splitinitbpindexes[0] + "." + splitinitbpindexes[1] + "." + i + " from the incremental chain");
+                            return filesChain;
+                        }
+                    }
+                }
+                else
+                {
+                    filesChain.Add(path);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                filesChain.Add(path);
+                filesChain.Add("Error");
+                filesChain.Add("Excption calculating file chain: "+ex.Message);
+                Console.WriteLine(ex.StackTrace);
             }
 
             return filesChain;

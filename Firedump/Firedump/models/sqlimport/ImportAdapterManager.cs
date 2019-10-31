@@ -96,7 +96,7 @@ namespace Firedump.models.sqlimport
                     onImportError("File doesnt exist, path: "+path);
                     return;
                 }
-                templocalpath = path;
+                templocalpath = ConfigurationManager.getInstance().mysqlDumpConfigInstance.tempSavePath;
                 templocalfilename = filename;
                 startDecompression();
             }
@@ -110,7 +110,7 @@ namespace Firedump.models.sqlimport
                 LocationCredentialsConfig config;
                 templocalpath = ConfigurationManager.getInstance().mysqlDumpConfigInstance.tempSavePath;
                 //calculate local path
-                if(!File.Exists(path + filename))
+                if(!File.Exists(templocalpath + filename))
                 {
                     templocalfilename = filename;
                 }
@@ -195,7 +195,14 @@ namespace Firedump.models.sqlimport
             if (isCompressed)
             {
                 CompressionConfig config = new CompressionConfig();
-                config.absolutePath = templocalpath + templocalfilename;
+                if (isLocal)
+                {
+                    config.absolutePath = path + templocalfilename;
+                }
+                else
+                {
+                    config.absolutePath = templocalpath + templocalfilename;
+                }
                 decompressDirectory = templocalpath + templocalfilename.Replace(StringUtils.getExtension(templocalfilename), "") + "\\";
                 config.decompressDirectory = decompressDirectory;
                 config.isEncrypted = isEncrypted;
@@ -222,7 +229,15 @@ namespace Firedump.models.sqlimport
             }
             else
             {
-                importconfig.scriptPath = templocalpath + templocalfilename;
+                if (isLocal)
+                {
+                    importconfig.scriptPath = path + templocalfilename;
+                }
+                else
+                {
+                    importconfig.scriptPath = templocalpath + templocalfilename;
+                }
+                
             }
             importadapter = new ImportAdapter(importconfig);
             importadapter.ImportComplete += onImportCompleteHandler;
