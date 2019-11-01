@@ -4,6 +4,7 @@ using System;
 using System.IO;
 using Newtonsoft.Json;
 using Microsoft.CSharp.RuntimeBinder;
+using System.Runtime.CompilerServices;
 
 namespace Firedump.models.configuration.jsonconfig
 {
@@ -152,6 +153,7 @@ namespace Firedump.models.configuration.jsonconfig
         private static MySqlDumpConfig mysqlDumpConfigInstance;
 
         private MySqlDumpConfig() { }
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public static MySqlDumpConfig getInstance()
         {
             if (mysqlDumpConfigInstance == null)
@@ -166,50 +168,18 @@ namespace Firedump.models.configuration.jsonconfig
             try
             {    
                 string json = File.ReadAllText(jsonFilePath);
-                dynamic jsonObj = JsonConvert.DeserializeObject(json);
-                //<Field initialization>
-                this.tempSavePath = jsonObj["tempSavePath"];
-                this.databaseTimeout = jsonObj["databaseTimeout"];
-                this.includeCreateSchema = jsonObj["includeCreateSchema"];
-                this.includeData = jsonObj["includeData"];
-                this.includeComments = jsonObj["includeComments"];
-                this.singleTransaction = jsonObj["singleTransaction"];
-                this.disableForeignKeyChecks = jsonObj["disableForeignKeyChecks"];
-                this.addDropDatabase = jsonObj["addDropDatabase"];
-                this.createDatabase = jsonObj["createDatabase"];
-                this.moreCompatible = jsonObj["moreCompatible"];
-                this.addCustomCommentInHeader = jsonObj["addCustomCommentInHeader"];
-                this.characterSet = jsonObj["characterSet"];
-                this.addDropTable = jsonObj["addDropTable"];
-                this.addIfNotExists = jsonObj["addIfNotExists"];
-                this.addAutoIncrementValue = jsonObj["addAutoIncrementValue"];
-                this.encloseWithBackquotes = jsonObj["encloseWithBackquotes"];
-                this.addCreateProcedureFunction = jsonObj["addCreateProcedureFunction"];
-                this.addInfoComments = jsonObj["addInfoComments"];
-                this.completeInsertStatements = jsonObj["completeInsertStatements"];
-                this.extendedInsertStatements = jsonObj["extendedInsertStatements"];
-                this.maximumLengthOfQuery = jsonObj["maximumLengthOfQuery"];
-                this.maximumPacketLength = jsonObj["maximumPacketLength"];
-                this.useDelayedInserts = jsonObj["useDelayedInserts"];
-                this.useIgnoreInserts = jsonObj["useIgnoreInserts"];
-                this.dumpTriggers = jsonObj["dumpTriggers"];
-                this.dumpEvents = jsonObj["dumpEvents"];
-                this.useHexadecimal = jsonObj["useHexadecimal"];
-                this.exportType = jsonObj["exportType"];
-                this.xml = jsonObj["xml"];
-                //</Field initialization>
+                mysqlDumpConfigInstance = JsonConvert.DeserializeObject<MySqlDumpConfig>(json);
                 return mysqlDumpConfigInstance;
             }
             catch (Exception ex)
             {
                 mysqlDumpConfigInstance = new MySqlDumpConfig(); //resetarei sta default options giati mporei apo panw na exoun allaksei kapoia se periptwsi corrupted data
                 mysqlDumpConfigInstance.saveConfig();
-                mysqlDumpConfigInstance.initializeConfig();
-                return mysqlDumpConfigInstance; //never reached just to avoid error message
                 if (!(ex is FileNotFoundException || ex is JsonException || ex is RuntimeBinderException))
                 {
-                    Console.WriteLine("MySqlDumpConfig.initializeConfig(): "+ex.ToString());
+                    Console.WriteLine("MySqlDumpConfig.initializeConfig(): " + ex.ToString());
                 }
+                return mysqlDumpConfigInstance; //never reached just to avoid error message
             }
         }
 
@@ -229,7 +199,6 @@ namespace Firedump.models.configuration.jsonconfig
         {
             mysqlDumpConfigInstance = new MySqlDumpConfig();
             mysqlDumpConfigInstance.saveConfig();
-            mysqlDumpConfigInstance.initializeConfig();
             return mysqlDumpConfigInstance;
         }
     }

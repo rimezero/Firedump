@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -73,6 +74,7 @@ namespace Firedump.models.configuration.jsonconfig
 
         private static CompressConfig compressConfigInstance;
         private CompressConfig() { }
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public static CompressConfig getInstance()
         {
             if (compressConfigInstance == null)
@@ -87,30 +89,18 @@ namespace Firedump.models.configuration.jsonconfig
             try
             {
                 string json = File.ReadAllText(jsonFilePath);
-                dynamic jsonObj = JsonConvert.DeserializeObject(json);
-                //<Field initialization>
-                this.enableCompression = jsonObj["enableCompression"];
-                this.use7zip = jsonObj["use7zip"];
-                this.use32bit = jsonObj["use32bit"];
-                this.compressionLevel = jsonObj["compressionLevel"];
-                this.useMultithreading = jsonObj["useMultithreading"];
-                this.enablePasswordEncryption = jsonObj["enablePasswordEncryption"];
-                this.fileType = jsonObj["fileType"];
-                this.password = jsonObj["password"];
-                this.encryptHeader = jsonObj["encryptHeader"];
-                //</Field initialization>
+                compressConfigInstance = JsonConvert.DeserializeObject<CompressConfig>(json);
                 return compressConfigInstance;
             }
             catch (Exception ex)
             {
                 compressConfigInstance = new CompressConfig(); //resetarei sta default options giati mporei apo panw na exoun allaksei kapoia se periptwsi corrupted data
                 compressConfigInstance.saveConfig();
-                compressConfigInstance.initializeConfig();
-                return compressConfigInstance; //never reached just to avoid error message
                 if (!(ex is FileNotFoundException || ex is JsonException || ex is RuntimeBinderException))
                 {
                     Console.WriteLine("MySqlDumpConfig.initializeConfig(): " + ex.ToString());
                 }
+                return compressConfigInstance; //never reached just to avoid error message    
             }
         }
         public void saveConfig()
@@ -132,7 +122,6 @@ namespace Firedump.models.configuration.jsonconfig
         {
             compressConfigInstance = new CompressConfig();
             compressConfigInstance.saveConfig();
-            compressConfigInstance.initializeConfig();
             return compressConfigInstance;
         }
     }

@@ -37,6 +37,10 @@
   <PropertyGroup>
     <StartupObject />
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>
+    </ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Dropbox.Api, Version=0.1.6165.22196, Culture=neutral, PublicKeyToken=310f0e82fbb45d01, processorArchitecture=MSIL">
       <HintPath>..\packages\Dropbox.Api.4.1\lib\net45\Dropbox.Api.dll</HintPath>
@@ -244,6 +248,8 @@
     <Compile Include="models\configuration\dynamicconfig\ImportCredentialsConfig.cs" />
     <Compile Include="models\configuration\dynamicconfig\LocationCredentialsConfig.cs" />
     <Compile Include="models\configuration\dynamicconfig\MySQLCredentialsConfig.cs" />
+    <Compile Include="models\configuration\jsonconfig\BinlogConfig.cs" />
+    <Compile Include="models\configuration\jsonconfig\MysqlexeConfig.cs" />
     <Compile Include="models\dump\IncrementalUtils.cs" />
     <Compile Include="models\dump\BinlogDump.cs" />
     <Compile Include="models\dump\BinlogDumpAdapter.cs" />
@@ -648,6 +654,7 @@
     <None Include="resources\ftpicon.png" />
     <None Include="resources\googeldriveicon.png" />
     <None Include="resources\emailicon.png" />
+    <Content Include="resources\firedump.ico" />
     <Content Include="resources\icons\databaseimage.bmp">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

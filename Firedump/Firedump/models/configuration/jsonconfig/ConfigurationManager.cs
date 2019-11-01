@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -10,9 +11,12 @@ namespace Firedump.models.configuration.jsonconfig
     {
         public MySqlDumpConfig mysqlDumpConfigInstance { set; get; }
         public CompressConfig compressConfigInstance { set; get; }
+        public BinlogConfig binlogConfigInstance { set; get; }
+        public MysqlexeConfig mysqlexeConfigInstance { set; get; }
         private static ConfigurationManager configurationManagerInstance;
         private ConfigurationManager() { }
-        
+
+        [MethodImpl(MethodImplOptions.Synchronized)]
         /// <summary>
         /// 
         /// </summary>
@@ -33,6 +37,8 @@ namespace Firedump.models.configuration.jsonconfig
         {
             this.mysqlDumpConfigInstance = MySqlDumpConfig.getInstance().initializeConfig();
             this.compressConfigInstance = CompressConfig.getInstance().initializeConfig();
+            this.binlogConfigInstance = BinlogConfig.getInstance().initializeConfig();
+            this.mysqlexeConfigInstance = MysqlexeConfig.getInstance().initializeConfig();
             return configurationManagerInstance;
         }
 
@@ -44,12 +50,16 @@ namespace Firedump.models.configuration.jsonconfig
         {
             this.mysqlDumpConfigInstance.saveConfig();
             this.compressConfigInstance.saveConfig();
+            this.binlogConfigInstance.saveConfig();
+            this.mysqlexeConfigInstance.saveConfig();
         }
 
         public ConfigurationManager resetToDefaults()
         {
             this.mysqlDumpConfigInstance = MySqlDumpConfig.getInstance().resetToDefaults();
             this.compressConfigInstance = CompressConfig.getInstance().resetToDefaults();
+            this.binlogConfigInstance = BinlogConfig.getInstance().resetToDefaults();
+            this.mysqlexeConfigInstance = MysqlexeConfig.getInstance().resetToDefaults();
             return configurationManagerInstance;
         }
     }
