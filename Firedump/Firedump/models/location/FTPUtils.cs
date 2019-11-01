@@ -199,7 +199,13 @@ namespace Firedump.models.location
                 session.FileTransferProgress += sessionFileTransferProgress;
                 checkFingerprint();
 
-                string[] locationinfo = StringUtils.splitPath(config.locationPath);
+                string tmppath = config.locationPath;
+                if (!string.IsNullOrWhiteSpace(config.fnamePrefix))
+                {
+                    tmppath = config.locationPath + "_" +  config.fnamePrefix;
+                }
+
+                string[] locationinfo = StringUtils.splitPath(tmppath);
                 string[] sourceinfo = StringUtils.splitPath(config.sourcePath);
                 string ext = StringUtils.getExtension(sourceinfo[1]);
 

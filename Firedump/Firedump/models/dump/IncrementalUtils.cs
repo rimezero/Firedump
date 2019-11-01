@@ -1,5 +1,6 @@
 ﻿using Firedump.models.configuration.dynamicconfig;
 using Firedump.models.databaseUtils;
+using Firedump.models.location;
 using Firedump.utils;
 using System;
 using System.Collections.Generic;
@@ -82,6 +83,7 @@ namespace Firedump.models.dump
                 {
                     index = j;
                 }
+                j++;
             }
 
             List<string[]> splitBpFnames = new List<string[]>();
@@ -91,7 +93,19 @@ namespace Firedump.models.dump
                 string path = locations[0].path; //dialegw tixea to prwto location
                 string[] splitpath = StringUtils.splitPath(path);
                 List<string> fnames = new List<string>();
-                //edw ftp directory listing
+                switch (locations[0].service_type)
+                {
+                    case 1: //FTP
+                        fnames = getFtpDirectoryListing(locations[0], splitpath[0]);
+                        break;
+                    case 2: //dropbox
+                        break;
+                    case 3: //google drive
+                        break;
+                    default:
+                        break;
+                }
+                splitBpFnames = getSplitBpFnames(fnames, splitpath[1].Split('_')[0]);
             }
             else
             {
@@ -287,7 +301,7 @@ namespace Firedump.models.dump
                             filesindir = Directory.GetFiles(initpath);
                             break;
                         case 1: //FTP
-                                //connect k directory listing
+                            filesindir = getFtpDirectoryListing(location, initpath).ToArray();
                             break;
                         case 2: //dropbox
                             break;
@@ -367,6 +381,36 @@ namespace Firedump.models.dump
             }
 
             return filesChain;
+        }
+
+        private List<string> getFtpDirectoryListing(firedumpdbDataSet.backup_locationsRow location, string path)
+        {
+            List<string> filesindir = new List<string>();
+            FTPCredentialsConfig ftpConfig = new FTPCredentialsConfig();
+            ftpConfig.id = location.id;
+            ftpConfig.host = location.host;
+            ftpConfig.port = (int)location.port;
+            ftpConfig.username = location.username;
+            ftpConfig.password = location.password;
+            if (location.usesftp == 1)
+            {
+                ftpConfig.useSFTP = true;
+                ftpConfig.SshHostKeyFingerprint = location.ssh_key_fingerprint;
+            }
+            if (!string.IsNullOrEmpty(location.ssh_key))
+            {
+                ftpConfig.usePrivateKey = true;
+                ftpConfig.privateKeyPath = location.ssh_key;
+            }
+            FTPUtils ftputils = new FTPUtils(ftpConfig);
+            ftputils.startSession();
+            List<WinSCP.RemoteFileInfo> dirList = ftputils.getDirectoryListing(path, false, false);
+            ftputils.disposeSession();
+            foreach (WinSCP.RemoteFileInfo info in dirList)
+            {
+                filesindir.Add(info.FullName);
+            }
+            return filesindir;
         }
     }
 }

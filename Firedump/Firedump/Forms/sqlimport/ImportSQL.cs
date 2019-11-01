@@ -297,12 +297,21 @@ namespace Firedump.Forms.sqlimport
                 int isLocalInt = -1;
                 if (!isLocal)
                 {
-                    isLocalInt = 1;
+                    try
+                    {
+                        isLocalInt = (int)(long)location["id"];
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message, "Chain Import", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        Console.WriteLine(ex.StackTrace);
+                        return;
+                    }
                 }
                 pathsToImport = iutils.calculateChain(tb.Text,isLocalInt);
                 if (pathsToImport[0].StartsWith("Error"))
                 {
-                    MessageBox.Show(pathsToImport[0], "Chain Import", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show(pathsToImport[1], "Chain Import", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
                 path = pathsToImport[0];
