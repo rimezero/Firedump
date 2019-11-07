@@ -348,7 +348,7 @@ namespace Firedump.models.dump
             //dump execution
             Console.WriteLine(arguments.ToString());
 
-            string mysqldumpfile = "resources\\mysqldump\\mysqldump.exe";
+            string mysqldumpfile = "resources/mysqldump/mysqldump.exe";
             //now we can run test localy and on server
             //localy visual studio test suite will handle process mapping
             if (IsTest)

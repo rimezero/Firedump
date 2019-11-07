@@ -257,15 +257,15 @@ namespace Firedump
             loadServerData();
 
             ImageList imagelist = new ImageList();
-            imagelist.Images.Add(Bitmap.FromFile("resources\\icons\\databaseimage.bmp"));
-            imagelist.Images.Add(Bitmap.FromFile("resources\\icons\\tableimage.bmp"));
+            imagelist.Images.Add(Bitmap.FromFile("resources/icons/databaseimage.bmp"));
+            imagelist.Images.Add(Bitmap.FromFile("resources/icons/tableimage.bmp"));
             tvDatabases.ImageList = imagelist;
 
             imagelist = new ImageList();
-            imagelist.Images.Add(Bitmap.FromFile("resources\\icons\\thispc.bmp"));
-            imagelist.Images.Add(Bitmap.FromFile("resources\\icons\\ftpimage.bmp"));
-            imagelist.Images.Add(Bitmap.FromFile("resources\\icons\\dropboximage.bmp"));
-            imagelist.Images.Add(Bitmap.FromFile("resources\\icons\\googledriveicon.bmp"));
+            imagelist.Images.Add(Bitmap.FromFile("resources/icons/thispc.bmp"));
+            imagelist.Images.Add(Bitmap.FromFile("resources/icons/ftpimage.bmp"));
+            imagelist.Images.Add(Bitmap.FromFile("resources/icons/dropboximage.bmp"));
+            imagelist.Images.Add(Bitmap.FromFile("resources/icons/googledriveicon.bmp"));
             lbSaveLocations.SmallImageList = imagelist;
             
 

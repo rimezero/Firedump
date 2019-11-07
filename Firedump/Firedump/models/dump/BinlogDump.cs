@@ -61,7 +61,7 @@ namespace Firedump.models.dump
             // dump execution
             Console.WriteLine(arguments.ToString());
 
-            string binlogexefile = "resources\\mysqldump\\mysqlbinlog.exe";
+            string binlogexefile = "resources/mysqldump/mysqlbinlog.exe";
 
             proc = new Process
             {

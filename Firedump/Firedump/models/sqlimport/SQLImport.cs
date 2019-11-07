@@ -121,7 +121,7 @@ namespace Firedump.models.sqlimport
             {
                 StartInfo = new ProcessStartInfo
                 {
-                    FileName = "resources\\mysqldump\\mysql.exe",
+                    FileName = "resources/mysqldump/mysql.exe",
                     Arguments = buildMysqlexeArguments().ToString(),
                     UseShellExecute = false,
                     RedirectStandardOutput = true, //prepei na diavastoun me ti seira pou ginonte ta redirect alliws kolaei se endless loop
