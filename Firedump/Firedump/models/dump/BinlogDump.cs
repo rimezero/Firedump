@@ -196,6 +196,110 @@ namespace Firedump.models.dump
             arguments.Append(" -d "+config.database);
             arguments.Append(" --start-datetime=\""+config.startDateTime+"\"");
 
+            BinlogConfig binlogConfigInstance = ConfigurationManager.getInstance().binlogConfigInstance;
+            if (!string.IsNullOrWhiteSpace(binlogConfigInstance.base64output))
+            {
+                arguments.Append(" --base64-output="+binlogConfigInstance.base64output);
+            }
+            if (!string.IsNullOrWhiteSpace(binlogConfigInstance.bindAdress))
+            {
+                arguments.Append(" --bind-address=" + binlogConfigInstance.bindAdress);
+            }
+            if (!string.IsNullOrWhiteSpace(binlogConfigInstance.characterSetsDir))
+            {
+                arguments.Append(" --character-sets-dir=" + binlogConfigInstance.characterSetsDir);
+            }
+            if (!string.IsNullOrWhiteSpace(binlogConfigInstance.charsetName))
+            {
+                arguments.Append(" --set-charset=" + binlogConfigInstance.charsetName);
+            }
+            if (!string.IsNullOrWhiteSpace(binlogConfigInstance.compressionAlgorithms) && binlogConfigInstance.compressionAlgorithms!="uncompressed")
+            {
+                arguments.Append(" --compress"); //below version not working for current binlog.exe
+                //arguments.Append(" --compression-algorithms=" + binlogConfigInstance.compressionAlgorithms);
+            }
+            if (binlogConfigInstance.conServerId!=0)
+            {
+                arguments.Append(" --connection-server-id=" + binlogConfigInstance.conServerId);
+            }
+            if (binlogConfigInstance.debugCheck)
+            {
+                arguments.Append(" --debug-check");
+            }
+            if (binlogConfigInstance.debugInfo)
+            {
+                arguments.Append(" --debug-info");
+            }
+            if (!string.IsNullOrWhiteSpace(binlogConfigInstance.debugOptions))
+            {
+                arguments.Append(" --debug=" + binlogConfigInstance.debugOptions);
+            }
+            if (binlogConfigInstance.disableLogBin)
+            {
+                arguments.Append(" -D");
+            }
+            if (!string.IsNullOrWhiteSpace(binlogConfigInstance.excludeGtids))
+            {
+                arguments.Append(" --exclude-gtids=" + binlogConfigInstance.excludeGtids);
+            }
+            if (binlogConfigInstance.forceIfOpen)
+            {
+                arguments.Append(" -F");
+            }
+            if (binlogConfigInstance.forceRead)
+            {
+                arguments.Append(" -f");
+            }
+            if (binlogConfigInstance.getServerPublicKey)
+            {
+                arguments.Append(" --get-server-public-key");
+            }
+            if (binlogConfigInstance.hexdump)
+            {
+                arguments.Append(" -H");
+            }
+            if (binlogConfigInstance.idempotent)
+            {
+                arguments.Append(" -idempotent");
+            }
+            if (binlogConfigInstance.printDefaults)
+            {
+                arguments.Append(" --print-defaults");
+            }
+            if (binlogConfigInstance.printTableMetadata)
+            {
+                arguments.Append(" --print-table-metadata");
+            }
+            if (!string.IsNullOrWhiteSpace(binlogConfigInstance.protocol))
+            {
+                arguments.Append(" --protocol=" + binlogConfigInstance.protocol);
+            }
+            if (binlogConfigInstance.raw)
+            {
+                arguments.Append(" --raw");
+            }
+            if (!string.IsNullOrWhiteSpace(binlogConfigInstance.rewriteDb))
+            {
+                arguments.Append(" --rewrite-db=" + binlogConfigInstance.rewriteDb);
+            }
+            if (binlogConfigInstance.rowEventMaxSize != 0)
+            {
+                arguments.Append(" --binlog-row-event-max-size=" + binlogConfigInstance.rowEventMaxSize);
+            }
+            if (binlogConfigInstance.serverId != -1)
+            {
+                arguments.Append(" --server-id=" + binlogConfigInstance.serverId);
+            }
+            if (binlogConfigInstance.skipGtids)
+            {
+                arguments.Append(" --skip-gtids=true");
+            }
+            if (binlogConfigInstance.verbose)
+            {
+                arguments.Append(" -v");
+            }
+
+
             //last
             arguments.Append(" ");
             foreach (string fname in config.logfiles)

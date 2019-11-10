@@ -220,5 +220,11 @@ namespace Firedump.Forms.configuration
             MoreSQLOptions moreSQLoptions = new MoreSQLOptions();
             moreSQLoptions.ShowDialog();
         }
+
+        private void bBinlogConfig_Click(object sender, EventArgs e)
+        {       
+            BinlogConfiguration binlogConfiguration = new BinlogConfiguration();
+            binlogConfiguration.Show();
+        }
     }
 }

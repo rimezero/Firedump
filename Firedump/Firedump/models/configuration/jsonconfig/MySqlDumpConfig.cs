@@ -94,7 +94,7 @@ namespace Firedump.models.configuration.jsonconfig
         /// <summary>
         /// wether to add create procedure and function statements in the sql file
         /// </summary>
-        public bool addCreateProcedureFunction { set; get; }
+        public bool addCreateProcedureFunction { set; get; } = true;
         /// <summary>
         /// wether to add info comments (creation/update/check dates)
         /// </summary>
@@ -128,11 +128,11 @@ namespace Firedump.models.configuration.jsonconfig
         /// <summary>
         /// wether to dump triggers
         /// </summary>
-        public bool dumpTriggers { set; get; }
+        public bool dumpTriggers { set; get; } = true;
         /// <summary>
         /// wether to dump events
         /// </summary>
-        public bool dumpEvents { set; get; }
+        public bool dumpEvents { set; get; } = true;
         /// <summary>
         /// dump binary columns using hexadecimal notation for example 'abc' becomes 0x616263)
         /// </summary>
@@ -187,7 +187,15 @@ namespace Firedump.models.configuration.jsonconfig
         {
             if (string.IsNullOrEmpty(this.tempSavePath))
             {
-                this.tempSavePath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\AppData\\Roaming\\Firedump\\";
+                string tmp = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                if (tmp.Contains("/home/"))
+                {
+                    this.tempSavePath = tmp + "/AppData/Firedump";
+                }
+                else
+                {
+                    this.tempSavePath = tmp + "\\AppData\\Roaming\\Firedump\\";
+                }
             }
             string jsonOutput = JsonConvert.SerializeObject(this, Formatting.Indented);
             FileInfo file = new FileInfo(jsonFilePath);

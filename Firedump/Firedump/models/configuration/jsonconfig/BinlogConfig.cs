@@ -110,7 +110,7 @@ namespace Firedump.models.configuration.jsonconfig
         /// --protocol={TCP|SOCKET|PIPE|MEMORY}
         /// The connection protocol to use for connecting to the server. It is useful when the other connection parameters normally result in use of a protocol other than the one you want.
         /// </summary>
-        public string protocol = "";
+        public string protocol = "tcp";
         /// <summary>
         /// --raw
         /// By default, mysqlbinlog reads binary log files and writes events in text format. The --raw option tells mysqlbinlog to write them in their original binary format.
