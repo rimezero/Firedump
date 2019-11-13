@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.gbGeneral = new System.Windows.Forms.GroupBox();
             this.cmbBase64 = new System.Windows.Forms.ComboBox();
             this.label13 = new System.Windows.Forms.Label();
@@ -50,9 +51,9 @@
             this.label4 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.tbBindAdress = new System.Windows.Forms.TextBox();
-            this.label2 = new System.Windows.Forms.Label();
+            this.lbExcludeGtids = new System.Windows.Forms.Label();
             this.tbExcludeGtids = new System.Windows.Forms.TextBox();
-            this.label1 = new System.Windows.Forms.Label();
+            this.lbCharsetDir = new System.Windows.Forms.Label();
             this.bCharsetDir = new System.Windows.Forms.Button();
             this.tbCharacterSetsDir = new System.Windows.Forms.TextBox();
             this.gbDebug = new System.Windows.Forms.GroupBox();
@@ -68,6 +69,7 @@
             this.bReset = new System.Windows.Forms.Button();
             this.bSave = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.cbServerTime = new System.Windows.Forms.CheckBox();
             this.cbSkipGtids = new System.Windows.Forms.CheckBox();
             this.cbRaw = new System.Windows.Forms.CheckBox();
             this.cbIdempotent = new System.Windows.Forms.CheckBox();
@@ -75,6 +77,7 @@
             this.cbForceRead = new System.Windows.Forms.CheckBox();
             this.cbForceIfOpen = new System.Windows.Forms.CheckBox();
             this.cbDisableBinaryLogging = new System.Windows.Forms.CheckBox();
+            this.tooltip1 = new System.Windows.Forms.ToolTip(this.components);
             this.gbGeneral.SuspendLayout();
             this.gbDebug.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -103,9 +106,9 @@
             this.gbGeneral.Controls.Add(this.label4);
             this.gbGeneral.Controls.Add(this.label3);
             this.gbGeneral.Controls.Add(this.tbBindAdress);
-            this.gbGeneral.Controls.Add(this.label2);
+            this.gbGeneral.Controls.Add(this.lbExcludeGtids);
             this.gbGeneral.Controls.Add(this.tbExcludeGtids);
-            this.gbGeneral.Controls.Add(this.label1);
+            this.gbGeneral.Controls.Add(this.lbCharsetDir);
             this.gbGeneral.Controls.Add(this.bCharsetDir);
             this.gbGeneral.Controls.Add(this.tbCharacterSetsDir);
             this.gbGeneral.Location = new System.Drawing.Point(78, 37);
@@ -307,15 +310,15 @@
             this.tbBindAdress.Size = new System.Drawing.Size(470, 26);
             this.tbBindAdress.TabIndex = 5;
             // 
-            // label2
+            // lbExcludeGtids
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(56, 133);
-            this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(133, 20);
-            this.label2.TabIndex = 4;
-            this.label2.Text = "Exclude gtid sets:";
+            this.lbExcludeGtids.AutoSize = true;
+            this.lbExcludeGtids.Location = new System.Drawing.Point(56, 133);
+            this.lbExcludeGtids.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lbExcludeGtids.Name = "lbExcludeGtids";
+            this.lbExcludeGtids.Size = new System.Drawing.Size(133, 20);
+            this.lbExcludeGtids.TabIndex = 4;
+            this.lbExcludeGtids.Text = "Exclude gtid sets:";
             // 
             // tbExcludeGtids
             // 
@@ -325,15 +328,15 @@
             this.tbExcludeGtids.Size = new System.Drawing.Size(470, 26);
             this.tbExcludeGtids.TabIndex = 3;
             // 
-            // label1
+            // lbCharsetDir
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(8, 78);
-            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(181, 20);
-            this.label1.TabIndex = 2;
-            this.label1.Text = "Character sets directory:";
+            this.lbCharsetDir.AutoSize = true;
+            this.lbCharsetDir.Location = new System.Drawing.Point(8, 78);
+            this.lbCharsetDir.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lbCharsetDir.Name = "lbCharsetDir";
+            this.lbCharsetDir.Size = new System.Drawing.Size(181, 20);
+            this.lbCharsetDir.TabIndex = 2;
+            this.lbCharsetDir.Text = "Character sets directory:";
             // 
             // bCharsetDir
             // 
@@ -498,6 +501,7 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.cbServerTime);
             this.groupBox1.Controls.Add(this.cbSkipGtids);
             this.groupBox1.Controls.Add(this.cbRaw);
             this.groupBox1.Controls.Add(this.cbIdempotent);
@@ -514,10 +518,21 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "General";
             // 
+            // cbServerTime
+            // 
+            this.cbServerTime.AutoSize = true;
+            this.cbServerTime.Location = new System.Drawing.Point(272, 218);
+            this.cbServerTime.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.cbServerTime.Name = "cbServerTime";
+            this.cbServerTime.Size = new System.Drawing.Size(189, 24);
+            this.cbServerTime.TabIndex = 11;
+            this.cbServerTime.Text = "Use mysql server time";
+            this.cbServerTime.UseVisualStyleBackColor = true;
+            // 
             // cbSkipGtids
             // 
             this.cbSkipGtids.AutoSize = true;
-            this.cbSkipGtids.Location = new System.Drawing.Point(272, 219);
+            this.cbSkipGtids.Location = new System.Drawing.Point(63, 218);
             this.cbSkipGtids.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.cbSkipGtids.Name = "cbSkipGtids";
             this.cbSkipGtids.Size = new System.Drawing.Size(104, 24);
@@ -591,6 +606,12 @@
             this.cbDisableBinaryLogging.Text = "Disable Binary Logging";
             this.cbDisableBinaryLogging.UseVisualStyleBackColor = true;
             // 
+            // tooltip1
+            // 
+            this.tooltip1.AutoPopDelay = 5000;
+            this.tooltip1.InitialDelay = 100;
+            this.tooltip1.ReshowDelay = 100;
+            // 
             // BinlogConfiguration
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
@@ -622,7 +643,7 @@
         #endregion
 
         private System.Windows.Forms.GroupBox gbGeneral;
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label lbCharsetDir;
         private System.Windows.Forms.Button bCharsetDir;
         private System.Windows.Forms.TextBox tbCharacterSetsDir;
         private System.Windows.Forms.GroupBox gbDebug;
@@ -643,7 +664,7 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox tbBindAdress;
-        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label lbExcludeGtids;
         private System.Windows.Forms.TextBox tbExcludeGtids;
         private System.Windows.Forms.Label label13;
         private System.Windows.Forms.TextBox tbRowEventMaxSize;
@@ -668,5 +689,7 @@
         private System.Windows.Forms.CheckBox cbForceIfOpen;
         private System.Windows.Forms.CheckBox cbDisableBinaryLogging;
         private System.Windows.Forms.ComboBox cmbBase64;
+        private System.Windows.Forms.CheckBox cbServerTime;
+        private System.Windows.Forms.ToolTip tooltip1;
     }
 }

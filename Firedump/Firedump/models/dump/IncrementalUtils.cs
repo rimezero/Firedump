@@ -1,4 +1,5 @@
 ﻿using Firedump.models.configuration.dynamicconfig;
+using Firedump.models.configuration.jsonconfig;
 using Firedump.models.databaseUtils;
 using Firedump.models.location;
 using Firedump.utils;
@@ -132,16 +133,23 @@ namespace Firedump.models.dump
                 prefix += "FB_0.0.0";
             }
 
-            MySQLCredentialsConfig myconfig = new MySQLCredentialsConfig();
-            myconfig.host = config.host;
-            myconfig.port = config.port;
-            myconfig.username = config.username;
-            myconfig.password = config.password;
-            myconfig.database = config.database;
-            DbConnection dbcon = new DbConnection(myconfig);
-            //prefix += "_" + dbcon.getCurrentDatetime().Replace(':', ',');
-            prefix += "_" + DateTime.Now.ToString("yyyy-M-d HH:mm:ss").Replace(':', ',');
             //calculate datetime and add it to prefix in binlog required format
+            if (ConfigurationManager.getInstance().binlogConfigInstance.useServerTime)
+            {
+                MySQLCredentialsConfig myconfig = new MySQLCredentialsConfig();
+                myconfig.host = config.host;
+                myconfig.port = config.port;
+                myconfig.username = config.username;
+                myconfig.password = config.password;
+                myconfig.database = config.database;
+                DbConnection dbcon = new DbConnection(myconfig);
+                prefix += "_" + dbcon.getCurrentDatetime().Replace(':', ',');
+            }
+            else
+            {
+                prefix += "_" + DateTime.Now.ToString("yyyy-M-d HH:mm:ss").Replace(':', ',');
+            }
+            
 
             //</filename_prefix>
 

@@ -147,6 +147,11 @@ namespace Firedump.models.configuration.jsonconfig
         /// Reconstruct row events and display them as commented SQL statements, with table partition information where applicable.
         /// </summary>
         public bool verbose = false;
+        /// <summary>
+        /// Use mysql server time instead of local machine's to increase dump time precision
+        /// WARNING: the server and the client must be in the same time zone for this option to work correctly
+        /// </summary>
+        public bool useServerTime = false;
         //</configuration fields section>
 
         private static BinlogConfig binlogConfigInstance;
