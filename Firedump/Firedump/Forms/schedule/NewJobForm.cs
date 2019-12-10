@@ -93,6 +93,9 @@ namespace Firedump.Forms.schedule
                 return;
             }
 
+            int ibinterval = (int)numericIBInterval.Value;
+            int idbinterval = (int)numericIDBInterval.Value;
+
             DbConnection con = new DbConnection();           
             con.Host = (string)serverData.Rows[cmbServers.SelectedIndex]["host"];
             con.port = unchecked((int)(long)serverData.Rows[cmbServers.SelectedIndex]["port"]);
@@ -115,6 +118,12 @@ namespace Firedump.Forms.schedule
                     jobdetails.Name = jobname;
                     jobdetails.Database = cmbdatabase.SelectedItem.ToString();
                     jobdetails.Tables = tables;
+                    if (cbIncremental.Checked)
+                    {
+                        jobdetails.Tables.Insert(0, idbinterval.ToString());
+                        jobdetails.Tables.Insert(0, ibinterval.ToString());
+                        jobdetails.Tables.Insert(0, "inc_enabled");
+                    }
                     jobdetails.Server = (firedumpdbDataSet.mysql_serversRow)serverData.Rows[cmbServers.SelectedIndex];
                     jobdetails.LocationId = id;
                     jobdetails.LocationName = locname;

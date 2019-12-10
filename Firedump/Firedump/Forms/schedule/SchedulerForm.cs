@@ -106,7 +106,16 @@ namespace Firedump.Forms.schedule
             Console.WriteLine(jobDetails.DayOfWeek);
             
             firedumpdbDataSetTableAdapters.schedulesTableAdapter scheduleAdapter = new firedumpdbDataSetTableAdapters.schedulesTableAdapter();
-            scheduleAdapter.Insert((int)jobDetails.Server.id, jobDetails.Name,DateTime.Now,jobDetails.Activate, jobDetails.Hour, jobDetails.Database,"-",jobDetails.Minute,jobDetails.Second,jobDetails.DayOfWeek);           
+            string tmptables = "-";
+            if (jobDetails.Tables[0] == "inc_enabled")
+            {
+                tmptables = jobDetails.Tables[1] + "?>?" + jobDetails.Tables[2];
+                jobDetails.Tables.RemoveAt(0);
+                jobDetails.Tables.RemoveAt(0);
+                jobDetails.Tables.RemoveAt(0);
+            }
+            
+            scheduleAdapter.Insert((int)jobDetails.Server.id, jobDetails.Name,DateTime.Now,jobDetails.Activate, jobDetails.Hour, jobDetails.Database,tmptables,jobDetails.Minute,jobDetails.Second,jobDetails.DayOfWeek);           
             firedumpdbDataSet.schedulesDataTable scheduleTable = new firedumpdbDataSet.schedulesDataTable();
            
             scheduleAdapter.FillIdByName(scheduleTable,jobDetails.Name);
