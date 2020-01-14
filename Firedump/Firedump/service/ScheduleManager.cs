@@ -78,8 +78,7 @@ namespace Firedump.service
             mysqldumpAdapter.TableStartDump += ontablestartdump;
             
             //File.AppendAllText(@"servicelog.txt", "STARTDUMP");
-            mysqldumpAdapter.startDump(dumpConfig);
-            
+            mysqldumpAdapter.startDump(dumpConfig);  
         }
 
         private void ontablestartdump(string table)
