@@ -95,6 +95,7 @@ namespace Firedump.models.dump
                 resultObj.wasSuccessful = false;
                 resultObj.errorNumber = -1;
                 resultObj.errorMessage = "Host not set";
+                return arguments;
             }
 
             //port
@@ -103,6 +104,7 @@ namespace Firedump.models.dump
                 resultObj.wasSuccessful = false;
                 resultObj.errorNumber = -1;
                 resultObj.errorMessage = "Invalid port number: " + credentialsConfigInstance.port;
+                return arguments;
             }
             else
             {
@@ -119,6 +121,7 @@ namespace Firedump.models.dump
                 resultObj.wasSuccessful = false;
                 resultObj.errorNumber = -1;
                 resultObj.errorMessage = "Username not set";
+                return arguments;
             }
 
             //pasword
